@@ -66,10 +66,8 @@ class tec_tac_toe:
         for i in range(3):
             if self.cells[i*3] == self.cells[i*3+1] == self.cells[i*3+2]:
                 self.who_is_winner(i*3)
-                break
-            if self.cells[i] == self.cells[i+3] == self.cells[i+6]:
+            if self.cells[i] == self.cells[i+3] == self.cells[i+6]: # 가로든 세로든 i=0인 부분에 o,x 가 없으면 판정이 안 됨.
                 self.who_is_winner(i)
-                break
         if self.cells[0] == self.cells[4] == self.cells[8] or self.cells[2] == self.cells[4] == self.cells[6]:
             self.who_is_winner( 4 )
 
@@ -93,10 +91,10 @@ class tec_tac_toe:
         else:
             self.text_label["text"] = "다른 곳을 선택해 주세요"
         self.judge()
-        self.for_debug()
+        self.for_debug(i)
 
-    def for_debug(self):
-        print( "trun : ", self.turn )
+    def for_debug(self, i):
+        print( "trun : ", self.turn , "selected cell : ", i+1)
         for i in range(3):
             print(self.cells[i*3],self.cells[i*3+1],self.cells[i*3+2])
 
