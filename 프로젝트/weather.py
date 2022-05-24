@@ -6,13 +6,52 @@ root = Tk()
 root.geometry("600x700+600+100")
 root.title('Sun')
 
-#-----------------------etc----------------------------------------
+
+
+#----------------------------파싱----------------------------------
+
+import requests # HTTP 요청을 보내는 모듈
+import json
+#import datetime
+
+
+nx = "60"               # 위도 변수
+ny = "127"              # 경도 변수
+
+base_date = "20220524"  # 날짜 변수
+base_time = "0600"      # 시각 변수
+
+                        # 서버 url 변수
+url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst'
+                        # 서버 인증키 변수(디코딩)
+serviceKey = 'nROKr9gqJ/zCVFiZhf/2PKCFTXCSUm3R4tzU4lLbQg9ehw7c1UnINQL413EYxPvHfVUaPVAkTMaSWabh11bt8Q=='
+                        # 위도, 경도, 날짜 , 저장
+params ={'serviceKey' : serviceKey, 'pageNo' : '1', 'numOfRows' : '1000', 'dataType' : 'JSON', 'base_date' : base_date, 'base_time' : base_time, 'nx' : nx, 'ny' : ny }
+                        # 정보 받아오는 부분
+response = requests.get(url, params=params)
+                        # JSON 파일 파싱 
+items = response.json().get('response').get('body').get('items')
+
+
+# 카테고리 코드값 
+# POP(강수확률) PTY(강수형태) REH(습도) SKY(하늘상태)
+# TMX(일 최고기온) TMN(일 최저기온) T1H(기온) TMP(1시간 기온) 
+#
+#
+               
+for item in items['item']:
+    if item['category'] =='PTY':
+        print(item['obsrValue'])
+    if item['category'] =='T1H':
+        Max_temp= item['obsrValue']
+
+
+#----------------------------etc-----------------------------------
 
 cities = ["서울","부산","경기","인천"]
 mail_img= PhotoImage(file=r"C:\Users\NA HYEON\Desktop\게임공학\3학년\스크립트언어\실습\05-17\mail_640_416.png")
 weather_top_img=PhotoImage(file=r"C:\Users\NA HYEON\Desktop\게임공학\3학년\스크립트언어\실습\05-17\weather_top.PNG")
 weather_bottom_img=PhotoImage(file=r"C:\Users\NA HYEON\Desktop\게임공학\3학년\스크립트언어\실습\05-17\weather_bottom.PNG")
-
 
 #------------------------검색 함수----------------------------------
 
@@ -73,7 +112,7 @@ Renewal_Button=Button(Frame_search,width=10,font=fontNormal,text="새로고침",
 Renewal_Button.pack(side="left",padx=10)
 
     # 최고 최저 기온 레이블 , 상세보기 버튼, 이메일 버튼    
-High_Temp_Lable= Label(Frame_etc,font=fontNormal,borderwidth=3,relief='groove',text="최고 기온 {0}".format("xx도"),bg='#FFFF99')
+High_Temp_Lable= Label(Frame_etc,font=fontNormal,borderwidth=3,relief='groove',text="최고 기온 {0}".format(Max_temp +"도"),bg='#FFFF99')
 High_Temp_Lable.pack(side="left",padx=10,fill="both")
 
 Low_Temp_Lable= Label(Frame_etc,font=fontNormal,borderwidth=3,relief='groove',text="최저 기온 {0}".format("xx도"),bg='#FFFF99')
