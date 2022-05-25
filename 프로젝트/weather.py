@@ -1,12 +1,21 @@
+from asyncio.windows_events import NULL
+from re import L
 from tkinter import *
 import tkinter
+import pickle
 from tkinter import font
+# 초기화를 해주지 않아도 되는 dict
+from collections import defaultdict
+
 
 root = Tk()
 root.geometry("600x700+600+100")
 root.title('Sun')
 
 #-----------------------etc----------------------------------------
+
+f = open('adress', 'rb') #pickle 사용을 위해 바이너리 읽기 파일 오픈
+adress_dict = pickle.load(f) #파일에서 리스트 load
 
 cities = ["서울","부산","경기","인천"]
 mail_img= PhotoImage(file=r"C:\Users\NA HYEON\Desktop\게임공학\3학년\스크립트언어\실습\05-17\mail_640_416.png")
@@ -19,7 +28,33 @@ weather_bottom_img=PhotoImage(file=r"C:\Users\NA HYEON\Desktop\게임공학\3학
 def Search_city():
     global cities
     global Search_Entry
-    print(Search_Entry.get())
+    global adress_dict
+    for_search = Search_Entry.get()
+
+    value = NULL
+
+    flag = False
+
+    import pprint
+    # adress_dict에서 for_search 찾는다.
+    for level_2 in adress_dict.values():
+        for level_3 in level_2.values():
+            for adress in level_3:
+                if for_search == adress:
+                    print(for_search)
+                    print(level_3[adress])
+                    flag = True
+                    break
+                    # level_3[adress] 가 튜플임. 순서대로 X, Y, 위도, 경도
+                if flag: break
+            if flag: break
+        if flag: break
+
+    if not flag:
+        print(for_search)
+        print("찾지 못 함")  
+                            # 1. 찾지 못 했을 경우 다른 값을 반환하고, 만약 이 값이 반환되면 찾지 못했다고 판단해야함. 
+                            # 2. 혹은 그냥 입력 받을때 기본값을 NULL로 해놓고 NULL이면 찾지 못했다고 코딩하면 될듯.
 
 def View_Detail():
     pass
