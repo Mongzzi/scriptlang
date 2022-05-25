@@ -85,6 +85,7 @@ def Search_city():
                     flag = True
                     break
                     # level_3[adress] 가 튜플임. 순서대로 X, Y, 위도, 경도
+                    # 사용 예시         nx, ny, latitude, longitude = level_3[adress]
                 if flag: break
             if flag: break
         if flag: break
