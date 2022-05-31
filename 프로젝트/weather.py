@@ -179,7 +179,8 @@ def Search_city():
         City_Name_Lable.config(text=str(name))
         Update()
 
-def draw_graph(canvas, data, canvasWidth, canvasHeight):
+def draw_graph(data, canvasWidth, canvasHeight):
+    global canvas
     canvas.delete(corrent_canvas_status) # 기존 그림 지우기
 
     if not len(data): # 데이터 없으면 return
@@ -223,7 +224,7 @@ def draw_canvas():
 
     elif corrent_canvas_status == opposite_status:
         # 여기서 위에 나온 정보들의 그래프를 그린다.
-        draw_graph(canvas, [670, 900, 150], 600, 300)
+        draw_graph([670, 900, 150], 580, 240)
 
 def View_Detail():
     global corrent_canvas_status, next_canvas_status
