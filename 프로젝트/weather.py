@@ -7,6 +7,7 @@ from tkinter import font
 # 초기화를 해주지 않아도 되는 dict
 from collections import defaultdict
 from numpy import true_divide
+import tkintermapview   # 지도를 위한 참조
 
 
 root = Tk()
@@ -18,17 +19,28 @@ root.title('Sun')
 nx = "62"               # 위도 변수
 ny = "125"              # 경도 변수
 
+latitude = NULL         # 지도용 위도 경도
+longitude = NULL
+
 base_date = "20220531"  # 날짜 변수
 base_time = "0600"      # 시각 변수
 
 Cur_temp = "0"          # 현재 온도    
 items= NULL
 
-default_status = "기본"
+default_status = "기본보기"
 opposite_status = "그래프보기"
+
+# 지도 관련 변수
+number_of_marker = 0
+markerlist = []
+
 
 corrent_canvas_status = default_status  # "기본" = 기본, "상세보기" = 상세보기
 next_canvas_status = opposite_status  # 이 둘은 서로 바뀌어야한다.
+
+
+
 
 #----------------------------파싱----------------------------------
 
@@ -45,6 +57,19 @@ serviceKey = 'nROKr9gqJ/zCVFiZhf/2PKCFTXCSUm3R4tzU4lLbQg9ehw7c1UnINQL413EYxPvHfV
 # 카테고리 코드값 
 # POP(강수확률) PTY(강수형태) REH(습도) SKY(하늘상태)
 # TMX(일 최고기온) TMN(일 최저기온) T1H(기온) TMP(1시간 기온) 
+
+def Update_map():
+    global map_widget
+    global City_Name_Lable
+    global nx, ny
+    global number_of_marker, markerlist
+    
+    if latitude and longitude:
+        marker_1 = map_widget.set_position(float(latitude), float(longitude), marker=True)
+        # print(marker_1.position, marker_1.text) # 확인용 출력
+        marker_1.set_text(City_Name_Lable["text"]) # set new text
+        map_widget.set_zoom(15) # 0~19 (19 is the highest zoom level)
+        markerlist.append(marker_1)
 
 def Update():
     global nx,ny
@@ -75,6 +100,7 @@ def Update():
             
             
     Change_Label_Temp()
+    Update_map()
 
 #----------------------------etc-----------------------------------
 
@@ -101,6 +127,7 @@ def Search_city():
     global adress_dict
     global nx, ny
     global items, Max_temp
+    global latitude, longitude
     for_search = Search_Entry.get()
 
     val = NULL
@@ -145,8 +172,9 @@ def Search_city():
         nx, ny, latitude, longitude = val
         nx = str(nx)
         ny = str(ny)
-        latitude=str(latitude)
-        longitude=str(longitude)
+        
+        # latitude=str(latitude)
+        # longitude=str(longitude)
         
         
         City_Name_Lable.config(text=str(name))
@@ -173,6 +201,15 @@ def View_Detail():
     draw_canvas()
     pass
 
+def Refresh_markers():
+    global markerlist
+
+    for marker in markerlist:
+        marker.delete()
+        # marker_1.delete()
+
+def Refresh():
+    Refresh_markers()
 
 #--------------------------<폰트>-------------------------------------
 
@@ -198,6 +235,9 @@ Frame_etc.pack(side="top",fill="x")
 Frame_information=Frame(root,padx=10, pady=10, bg='#CCFFFF')
 Frame_information.pack(side="top",fill="both",expand=True)
 
+    #임시 지도 출력부
+Frame_map=Frame(root,padx=10, pady=10, bg='#999999')
+Frame_map.pack(side="top",fill="both",expand=True)
 #------------------------<위젯 부분>--------------------------------
 
     # 제목 레이블
@@ -211,7 +251,7 @@ Search_Entry.pack(side="left",padx=10)
 Search_Button=Button(Frame_search,width=5,font=fontNormal,text="검색",command=Search_city)
 Search_Button.pack(side="left",padx=10)
 
-Renewal_Button=Button(Frame_search,width=10,font=fontNormal,text="새로고침",command=Search_city)
+Renewal_Button=Button(Frame_search,width=10,font=fontNormal,text="새로고침",command=Refresh)
 Renewal_Button.pack(side="left",padx=10)
 
     # 현재 최고 최저 기온 레이블 , 상세보기 버튼, 이메일 버튼
@@ -234,10 +274,14 @@ View_Detail_Button.pack(side="right",padx=10,fill="both")
 
     # 날씨 정보 그래프 레이블
 
-canvas = Canvas(Frame_information, bg = "white", ) # width = 400; height = 280 width = width, height = height
+canvas = Canvas(Frame_information, bg = "white")
 canvas.pack(fill="both")
 
 draw_canvas() # 한번 먼저 그려놓는다
+
+    # 지도 레이블
+map_widget = tkintermapview.TkinterMapView(Frame_map, width=800, height=500, corner_radius=0)
+map_widget.pack()
 
 root.mainloop()
 
