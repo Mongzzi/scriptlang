@@ -152,9 +152,11 @@ def Search_city():
 def draw_canvas():
     if corrent_canvas_status == "기본":
         text1 = canvas.create_text(200,220, text = corrent_canvas_status, font = ("나눔고딕코딩", 20),tags=corrent_canvas_status)
+        # 여기서 날씨정보
 
     elif corrent_canvas_status == "상세보기":
         text1 = canvas.create_text(200,220, text = corrent_canvas_status, font = ("나눔고딕코딩", 20),tags=corrent_canvas_status)
+        # 여기서 위에 나온 정보들의 그래프를 그린다.
 
 def View_Detail():
     global corrent_canvas_status, next_canvas_status
