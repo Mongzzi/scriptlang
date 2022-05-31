@@ -39,6 +39,8 @@ markerlist = []
 corrent_canvas_status = default_status  # "기본" = 기본, "상세보기" = 상세보기
 next_canvas_status = opposite_status  # 이 둘은 서로 바뀌어야한다.
 
+# 그래프 관련 변수
+canvas = NULL
 
 
 
@@ -177,14 +179,51 @@ def Search_city():
         City_Name_Lable.config(text=str(name))
         Update()
 
+def draw_graph(canvas, data, canvasWidth, canvasHeight):
+    canvas.delete(corrent_canvas_status) # 기존 그림 지우기
+
+    if not len(data): # 데이터 없으면 return
+        canvas.create_text(canvasWidth/2,(canvasHeight/2), text="No Data", tags=corrent_canvas_status)
+        return
+    nData = len(data) # 데이터 개수, 최대값, 최소값 얻어 놓기
+    nMax = max(data)
+    nMin = min(data)
+    # background 그리기
+    canvas.create_rectangle(0, 0, canvasWidth, canvasHeight, fill='white', tag=corrent_canvas_status)
+
+    if nMax == 0: # devide by zero 방지
+        nMax=1
+
+    rectWidth = (canvasWidth // nData) # 데이터 1개의 폭.
+    percentage_of_rect = 1 / 2  # 폭의 기둥의 비율
+    
+    bottom = canvasHeight - 20 # bar의 bottom 위치
+    maxheight = canvasHeight - 40 # bar의 최대 높이.(위/아래 각각 20씩 여유.)
+    for i in range(nData): # 각 데이터에 대해..
+        # max/min은 특별한 색으로.
+        if nMax == data[i]: color="red"
+        elif nMin == data[i]: color='blue'
+        else: color="grey"
+        
+        curHeight = maxheight * data[i] / nMax # 최대값에 대한 비율 반영
+        top = bottom - curHeight # bar의 top 위치
+        left = i * rectWidth + rectWidth * (1 - percentage_of_rect) / 2 # bar의 left 위치
+        right = (i + 1) * rectWidth - rectWidth * (1 - percentage_of_rect) / 2# bar의 right 위치
+        canvas.create_rectangle(left, top, right, bottom, fill=color, tag=corrent_canvas_status, activefill='yellow')
+        # 위에 값, 아래에 번호.
+        canvas.create_text((left+right)//2, top-10, text=data[i], tags=corrent_canvas_status)
+        canvas.create_text((left+right)//2, bottom+10, text=i+1, tags=corrent_canvas_status)
+
+
 def draw_canvas():
+    global canvas
     if corrent_canvas_status == default_status:
         text1 = canvas.create_text(200,220, text = corrent_canvas_status, font = ("나눔고딕코딩", 20),tags=corrent_canvas_status)
         # 여기서 날씨정보
 
     elif corrent_canvas_status == opposite_status:
-        text1 = canvas.create_text(200,220, text = corrent_canvas_status, font = ("나눔고딕코딩", 20),tags=corrent_canvas_status)
         # 여기서 위에 나온 정보들의 그래프를 그린다.
+        draw_graph(canvas, [670, 900, 150], 600, 300)
 
 def View_Detail():
     global corrent_canvas_status, next_canvas_status
