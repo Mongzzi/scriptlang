@@ -162,6 +162,7 @@ def Search_city():
                     # name 는 그 지역의 이름.
 
     if not flag:
+        City_Name_Lable.config(text=str(for_search)+" 찾지 못함")
         print(for_search)
         print("찾지 못 함")
                             # 1. 찾지 못 했을 경우 다른 값을 반환하고, 만약 이 값이 반환되면 찾지 못했다고 판단해야함. 
@@ -172,10 +173,6 @@ def Search_city():
         nx, ny, latitude, longitude = val
         nx = str(nx)
         ny = str(ny)
-        
-        # latitude=str(latitude)
-        # longitude=str(longitude)
-        
         
         City_Name_Lable.config(text=str(name))
         Update()
