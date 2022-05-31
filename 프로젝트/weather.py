@@ -18,12 +18,14 @@ root.title('Sun')
 nx = "62"               # 위도 변수
 ny = "125"              # 경도 변수
 
-base_date = "20220530"  # 날짜 변수
+base_date = "20220531"  # 날짜 변수
 base_time = "0600"      # 시각 변수
 
 Cur_temp = "0"          # 현재 온도    
 items= NULL
 
+corrent_canvas_status = "기본"  # "기본" = 기본, "상세보기" = 상세보기
+next_canvas_status = "상세보기"  # 이 둘은 서로 바뀌어야한다.
 
 #----------------------------파싱----------------------------------
 
@@ -147,7 +149,23 @@ def Search_city():
         City_Name_Lable.config(text=str(name))
         Update()
 
+def draw_canvas():
+    if corrent_canvas_status == "기본":
+        text1 = canvas.create_text(200,220, text = corrent_canvas_status, font = ("나눔고딕코딩", 20),tags=corrent_canvas_status)
+
+    elif corrent_canvas_status == "상세보기":
+        text1 = canvas.create_text(200,220, text = corrent_canvas_status, font = ("나눔고딕코딩", 20),tags=corrent_canvas_status)
+
 def View_Detail():
+    global corrent_canvas_status, next_canvas_status
+
+    # 현재 그림을 지운다.
+    canvas.delete(corrent_canvas_status)
+    # staus 교환
+    corrent_canvas_status, next_canvas_status = next_canvas_status, corrent_canvas_status
+    View_Detail_Button["text"] = next_canvas_status
+    # 새로운 그림을 그린다.
+    draw_canvas()
     pass
 
 
@@ -172,14 +190,8 @@ Frame_etc =Frame(root,pady=10, bg='#99FFFF')
 Frame_etc.pack(side="top",fill="x")
 
     #각종 그래프 및 정보 1
-Frame_graph=Frame(root,padx=10, pady=10, bg='#CCFFFF')
-Frame_graph.pack(side="top",fill="both",expand=True)
-
-Frame_graph_top=Frame(Frame_graph,padx=10, pady=10, bg='#CCCCFF')
-Frame_graph_top.pack(side="top",fill="both",expand=True)
-
-Frame_graph_bottom=Frame(Frame_graph,padx=10, pady=10, bg='#FFFFFF')
-Frame_graph_bottom.pack(side="top",fill="both",expand=True)
+Frame_information=Frame(root,padx=10, pady=10, bg='#CCFFFF')
+Frame_information.pack(side="top",fill="both",expand=True)
 
 #------------------------<위젯 부분>--------------------------------
 
@@ -211,21 +223,16 @@ Send_Email_Button = Button(Frame_etc,font=fontNormal,image=mail_img)
 Send_Email_Button.pack(side="right",padx=10,fill="both")
 
 
-View_Detail_Button= Button(Frame_etc,width=13,font=fontNormal,text="상세보기",command=View_Detail)
+View_Detail_Button= Button(Frame_etc,width=13,font=fontNormal,text=next_canvas_status,command=View_Detail)
 View_Detail_Button.pack(side="right",padx=10,fill="both")
 
 
     # 날씨 정보 그래프 레이블
-    
-Weather_Top_Lable=Label(Frame_graph_top,image=weather_top_img)
-Weather_Top_Lable.pack(fill="both")
 
-Weather_Bottom_Lable=Label(Frame_graph_bottom,image=weather_bottom_img)
-Weather_Bottom_Lable.pack(fill="both")
+canvas = Canvas(Frame_information, bg = "white", ) # width = 400; height = 280 width = width, height = height
+canvas.pack(fill="both")
 
-
-
-
+draw_canvas() # 한번 먼저 그려놓는다
 
 root.mainloop()
 
