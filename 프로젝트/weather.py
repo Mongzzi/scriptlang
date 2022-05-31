@@ -24,8 +24,11 @@ base_time = "0600"      # 시각 변수
 Cur_temp = "0"          # 현재 온도    
 items= NULL
 
-corrent_canvas_status = "기본"  # "기본" = 기본, "상세보기" = 상세보기
-next_canvas_status = "상세보기"  # 이 둘은 서로 바뀌어야한다.
+default_status = "기본"
+opposite_status = "그래프보기"
+
+corrent_canvas_status = default_status  # "기본" = 기본, "상세보기" = 상세보기
+next_canvas_status = opposite_status  # 이 둘은 서로 바뀌어야한다.
 
 #----------------------------파싱----------------------------------
 
@@ -150,11 +153,11 @@ def Search_city():
         Update()
 
 def draw_canvas():
-    if corrent_canvas_status == "기본":
+    if corrent_canvas_status == default_status:
         text1 = canvas.create_text(200,220, text = corrent_canvas_status, font = ("나눔고딕코딩", 20),tags=corrent_canvas_status)
         # 여기서 날씨정보
 
-    elif corrent_canvas_status == "상세보기":
+    elif corrent_canvas_status == opposite_status:
         text1 = canvas.create_text(200,220, text = corrent_canvas_status, font = ("나눔고딕코딩", 20),tags=corrent_canvas_status)
         # 여기서 위에 나온 정보들의 그래프를 그린다.
 
