@@ -8,7 +8,8 @@ from tkinter import font
 from collections import defaultdict
 from numpy import true_divide
 import tkintermapview   # 지도를 위한 참조
-
+import datetime # 날짜시간 모듈
+from datetime import date, datetime, timedelta  # 현재 날짜 외의 날짜 구하기 위한 모듈
 
 root = Tk()
 root.geometry("600x700+600+100")
@@ -22,8 +23,8 @@ ny = "125"              # 경도 변수
 latitude = NULL         # 지도용 위도 경도
 longitude = NULL
 
-base_date = "20220531"  # 날짜 변수
-base_time = "0600"      # 시각 변수
+base_date = datetime.today().strftime("%Y%m%d")  # 날짜 변수
+base_time = datetime.today().strftime("%H%M")    # 시간 변수
 
 Cur_temp = "0"          # 현재 온도    
 items= NULL
@@ -50,7 +51,7 @@ import requests # HTTP 요청을 보내는 모듈
 import json
 #import datetime
                         # 서버 url 변수
-url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst'
+url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst'
                         # 서버 인증키 변수(디코딩)
 serviceKey = 'nROKr9gqJ/zCVFiZhf/2PKCFTXCSUm3R4tzU4lLbQg9ehw7c1UnINQL413EYxPvHfVUaPVAkTMaSWabh11bt8Q=='
 
@@ -74,30 +75,35 @@ def Update_map():
         markerlist.append(marker_1)
 
 def Update():
+    global serviceKey,url
     global nx,ny
     global base_date, base_time
     global items,Cur_temp
+    global base_date,base_time
     
-                        # 위도, 경도, 날짜 , 저장
-    params ={'serviceKey' : serviceKey, 'pageNo' : '1', 'numOfRows' : '1000', 'dataType' : 'JSON', 'base_date' : base_date, 'base_time' : base_time, 'nx' : nx, 'ny' : ny }
-                        # 정보 받아오는 부분
+    base_date = datetime.today().strftime("%Y%m%d")  # 날짜 변수
+    base_time = datetime.today().strftime("%H%M")    # 시간 변수
+    
+    params ={'serviceKey' : serviceKey,  'numOfRows' : '1000','pageNo' : '1', 'dataType' : 'JSON', 'base_date' : base_date, 'base_time' : base_time, 'nx' : nx, 'ny' : ny }
     response = requests.get(url, params=params)
-                        # JSON 파일 파싱 
+    print(response.content)
     items = response.json().get('response').get('body').get('items')
     
     for item in items['item']:
-        
-        
-        if item['category'] =='PTY':
-            print(item['obsrValue'])
+        if item['category'] =='PTY':    #강수확률- 없음(0), 비(1), 비/눈(2), 눈(3), 빗방울(5), 빗방울눈날림(6), 눈날림(7)
+            print(item['fcstValue'])
             
+        if item['category'] =='RN1':    #1시간 강수량
+            print(item['fcstValue'])
             
-        if item['category'] =='T1H':
-            Cur_temp= str(item['obsrValue'])
+        if item['category'] =='T1H':    #온도
+            Cur_temp= str(item['fcstValue'])
             
+        if item['category'] =='REH':    #습도
+            print(item['fcstValue'])        
             
-        if item['category'] == 'TMN':
-            print("1231231231232")
+        if item['category'] =='SKY':    #하늘상태- 맑음(1), 구름많음(3), 흐림(4)
+            print(item['fcstValue'])              
             
             
             
