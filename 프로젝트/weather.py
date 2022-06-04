@@ -288,8 +288,13 @@ def draw_graph(canvasWidth, canvasHeight):
     nData = len(data) # 데이터 개수, 최대값, 최소값 얻어 놓기
     nMax = max(data)
     nMin = min(data)
+
+    # 크기 조절
+    size_of_infomation = 40
+    canvasWidth = canvasWidth - size_of_infomation
+
     # background 그리기
-    canvas.create_rectangle(0, 0, canvasWidth, canvasHeight, fill='white', tag=corrent_canvas_status)
+    # canvas.create_rectangle(0, 0, canvasWidth, canvasHeight, fill='white', tag=corrent_canvas_status)
 
     if nMax == 0: # devide by zero 방지
         nMax=1
@@ -297,8 +302,9 @@ def draw_graph(canvasWidth, canvasHeight):
     rectWidth = (canvasWidth // nData) # 데이터 1개의 폭.
     percentage_of_rect = 1 / 2  # 폭의 기둥의 비율
     
-    bottom = canvasHeight - 20 # bar의 bottom 위치
-    maxheight = canvasHeight - 40 # bar의 최대 높이.(위/아래 각각 20씩 여유.)
+    bottom = canvasHeight - 50 # bar의 bottom 위치 
+    maxheight = canvasHeight - 70 # bar의 최대 높이.(위/아래 각각 50씩 여유.  표 아래에 정보를 추가 할 때마다 15씩 늘일것)
+
     for i in range(nData): # 각 데이터에 대해..
         # max/min은 특별한 색으로.
         if nMax == data[i]: color="red"
@@ -307,12 +313,26 @@ def draw_graph(canvasWidth, canvasHeight):
         
         curHeight = maxheight * data[i] / nMax # 최대값에 대한 비율 반영
         top = bottom - curHeight # bar의 top 위치
-        left = i * rectWidth + rectWidth * (1 - percentage_of_rect) / 2 # bar의 left 위치
-        right = (i + 1) * rectWidth - rectWidth * (1 - percentage_of_rect) / 2# bar의 right 위치
+        left = size_of_infomation + i * rectWidth + rectWidth * (1 - percentage_of_rect) / 2 # bar의 left 위치
+        right = size_of_infomation + (i + 1) * rectWidth - rectWidth * (1 - percentage_of_rect) / 2# bar의 right 위치
         canvas.create_rectangle(left, top, right, bottom, fill=color, tag=corrent_canvas_status, activefill='yellow')
-        # 위에 값, 아래에 번호.
+
+        # 온도
         canvas.create_text((left+right)//2, top-10, text=data[i], tags=corrent_canvas_status)
-        canvas.create_text((left+right)//2, bottom+10, text=i+1, tags=corrent_canvas_status)
+        # 시간
+        hour = (int(base_time)//100 + i) % 24
+        if not hour:    # 0시로 표시하고 싶으면 주석처리할것.
+            hour = 24
+        canvas.create_text((left+right)//2, bottom+10, text=str(hour)+':'+"30", tags=corrent_canvas_status)
+        # 강수 확률
+        canvas.create_text((left+right)//2, bottom+25, text=weather_list[0][i], tags=corrent_canvas_status)
+        # 강수량
+        canvas.create_text((left+right)//2, bottom+40, text=weather_list[1][i], tags=corrent_canvas_status)
+
+    canvas.create_text(30, bottom-10, text='온도', tags=corrent_canvas_status)
+    canvas.create_text(30, bottom+10, text='시간', tags=corrent_canvas_status)
+    canvas.create_text(30, bottom+25, text='강수 확률', tags=corrent_canvas_status)
+    canvas.create_text(30, bottom+40, text='강수량', tags=corrent_canvas_status)
 
 
 def draw_canvas():
@@ -323,9 +343,7 @@ def draw_canvas():
 
     elif corrent_canvas_status == opposite_status:
         # 여기서 위에 나온 정보들의 그래프를 그린다.
-        
-
-        draw_graph(580, 240)
+        draw_graph(580, 260)
 
 def View_Detail():
     global corrent_canvas_status, next_canvas_status
@@ -405,8 +423,8 @@ City_Name_Lable.pack(side="left",padx=10,fill="both")
 Send_Email_Button = Button(Frame_etc,font=fontNormal,image=mail_img,command=Send_Mail)
 Send_Email_Button.pack(side="right",padx=10,fill="both")
 
-Email_Entry= Entry(Frame_etc,font=fontNormal,borderwidth=10,relief='ridge')
-Email_Entry.pack(side="right",padx=10)
+# Email_Entry= Entry(Frame_etc,font=fontNormal,borderwidth=10,relief='ridge')
+# Email_Entry.pack(side="right",padx=10)
 
 View_Detail_Button= Button(Frame_etc,width=13,font=fontNormal,text=next_canvas_status,command=View_Detail)
 View_Detail_Button.pack(side="right",padx=10,fill="both")
