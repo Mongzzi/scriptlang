@@ -202,20 +202,49 @@ def sendMail(fromAddr,toAddr,msg):
     s.sendmail(fromAddr,[toAddr],msg.as_string())
     s.close()
 
-def Send_Mail():
+
+def make_data():
+    global base_date,base_time,weather_list
+
+    return '오늘의 날자 ' + base_date + '\n'\
+    + str(int(base_time)//100) + '시' + str(int(base_time)%100) + '분의 '\
+    + City_Name_Lable['text']+'의 날씨입니다.\n'\
+    + '강수확률 = ' + str(rain_condition(weather_list[0][0])\
+    + '\n강수량 = '+ weather_list[1][0] \
+    + '\n현재온도 = ' + weather_list[2][0]+'도'\
+    + '\n현재습도 = '+weather_list[3][0]+'%'\
+    + '\n현재 하늘상태 = '+str(sky_condition(weather_list[4][0])))\
+    
+
+def onEmailInput():
     global Email_Entry
     global base_date,base_time,weather_list
     
     #[0] = 강수확률 [1] = 강수량 [2] = 온도 [3] =습도 [4] = 하늘상태
     #강수확률- 없음(0), 비(1), 비/눈(2), 눈(3), 빗방울(5), 빗방울눈날림(6), 눈날림(7)
-
-        
-    show_data = base_date + '\n' + base_time +'\n' + '강수확률 = '+str(rain_condition(weather_list[0][0])+ '\n강수량 = '+ weather_list[1][0] +'\n현재온도 = ' 
-                                                                   + weather_list[2][0]+'도'+'\n현재습도 = '+weather_list[3][0]+'%'+'\n현재 하늘상태 = '+str(sky_condition(weather_list[4][0])))
     
+    show_data = make_data()
+
+    print(show_data)
+
     msg=MIMEText(show_data)
     msg['Subject']= '날씨 정보'
-    sendMail('hjna0206@gmail.com',Email_Entry.get(),msg)
+    # sendMail('hjna0206@gmail.com',Email_Entry.get(),msg)
+    popup.destroy() # popup 내리기
+
+
+def onEmailPopup():
+    global root, popup
+    popup = Toplevel(root) # popup 띄우기
+    popup.geometry("300x150")
+    popup.title("받을 이메일 주소 입력")
+
+    global Email_Entry, btnEmail
+    Email_Entry = Entry(popup, width = 200,)
+    Email_Entry.pack(fill='x', padx=10, expand=True)
+
+    btnEmail = Button(popup, text="보내기", command=onEmailInput)
+    btnEmail.pack(anchor="s", padx=10, pady=10)
 
 #------------------------검색 함수----------------------------------
 
@@ -420,11 +449,10 @@ City_Name_Lable.pack(side="left",padx=10,fill="both")
 # Low_Temp_Lable= Label(Frame_etc,font=fontNormal,borderwidth=3,relief='groove',text="최저 기온 {0}".format(Cur_temp+"도"),bg='#FFFF99')
 # Low_Temp_Lable.pack(side="left",padx=10,fill="both")
 
-Send_Email_Button = Button(Frame_etc,font=fontNormal,image=mail_img,command=Send_Mail)
+Send_Email_Button = Button(Frame_etc,font=fontNormal,image=mail_img,command=onEmailPopup)
 Send_Email_Button.pack(side="right",padx=10,fill="both")
 
-# Email_Entry= Entry(Frame_etc,font=fontNormal,borderwidth=10,relief='ridge')
-# Email_Entry.pack(side="right",padx=10)
+popup = Email_Entry = btnEmail = None # 이메일 팝업에 사용
 
 View_Detail_Button= Button(Frame_etc,width=13,font=fontNormal,text=next_canvas_status,command=View_Detail)
 View_Detail_Button.pack(side="right",padx=10,fill="both")
