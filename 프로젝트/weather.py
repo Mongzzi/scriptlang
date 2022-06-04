@@ -26,7 +26,8 @@ longitude = NULL
 base_date = ""
 base_time = ""
 
-weather_list = []
+weather_list = [[],[],[],[],[]] # [0] = 강수확률 [1] = 강수량 [2] = 온도 [3] =습도 [4] = 하늘상태
+
 
 
 Cur_temp = "0"          # 현재 온도    
@@ -69,6 +70,7 @@ def Set_Time():
             base_time = str(datetime.now().hour) + "30"
         base_date = datetime.today().strftime("%Y%m%d")
 
+
 #----------------------------파싱----------------------------------
 
 import requests # HTTP 요청을 보내는 모듈
@@ -103,32 +105,43 @@ def Update():
     global nx,ny
     global base_date, base_time
     global items,Cur_temp
-    global base_date,base_time
+    global base_date,base_time,weather_list
     Set_Time()
     
     params ={'serviceKey' : serviceKey,  'numOfRows' : '1000','pageNo' : '1', 'dataType' : 'JSON', 'base_date' : base_date, 'base_time' : base_time, 'nx' : nx, 'ny' : ny }
     response = requests.get(url, params=params)
-    print(response.content)
+    #print(response.content)
     items = response.json().get('response').get('body').get('items')
     
     for item in items['item']:
         if item['category'] =='PTY':    #강수확률- 없음(0), 비(1), 비/눈(2), 눈(3), 빗방울(5), 빗방울눈날림(6), 눈날림(7)
-            print(item['fcstValue'])
+            #print(item['fcstValue'])
+            cnt=0
+            weather_list[cnt].append(item['fcstValue'])
             
         if item['category'] =='RN1':    #1시간 강수량
-            print(item['fcstValue'])
+            #print(item['fcstValue'])
+            cnt=1
+            weather_list[cnt].append(item['fcstValue'])
             
         if item['category'] =='T1H':    #온도
-            Cur_temp= str(item['fcstValue'])
+            cnt=2
+            weather_list[cnt].append(item['fcstValue'])
             
         if item['category'] =='REH':    #습도
-            print(item['fcstValue'])        
+            #print(item['fcstValue'])        
+            cnt=3
+            weather_list[cnt].append(item['fcstValue'])
             
         if item['category'] =='SKY':    #하늘상태- 맑음(1), 구름많음(3), 흐림(4)
-            print(item['fcstValue'])              
+            #print(item['fcstValue'])
+            cnt=4
+            weather_list[cnt].append(item['fcstValue'])
             
+    print(weather_list)         #weather_list = # [0] = 강수확률 [1] = 강수량 [2] = 온도 [3] =습도 [4] = 하늘상태
             
-            
+    Cur_temp=weather_list[2][0]
+    
     Change_Label_Temp()
     Update_map()
 
