@@ -240,6 +240,9 @@ def onEmailInput():
     # 이메일 검사
     Email_Flag = False
 
+    # 팝업용 변수들
+    main_text = lable_text = popup_command = None
+
     if '.' in email and '@' in email:
             Email_Flag = True
 
@@ -251,46 +254,42 @@ def onEmailInput():
             msg['Subject']= '날씨 정보'
             try:
                 sendMail('hjna0206@gmail.com',email,msg)
+                main_text="발송 성공"
 
-                Email_Popup_Popup = Toplevel(Email_Popup) # popup 띄우기
-                Email_Popup_Popup.geometry("400x150")
-                Email_Popup_Popup.title("발송 성공")
-
-                Popup_Popup_Lable= Label(Email_Popup_Popup,font=fontTitle,text="아마도 성공")
-                Popup_Popup_Lable.pack(expand=True)
-
-                Popup_Button = Button(Email_Popup_Popup, text="확인", command=Popup_Popup_command_2)
-                Popup_Button.pack(anchor="s", padx=10, pady=10)
+                lable_text="아마도 성공"
+                
+                popup_command=Popup_Popup_command_2
             except:
-                Email_Popup_Popup = Toplevel(Email_Popup) # popup 띄우기
-                Email_Popup_Popup.geometry("400x150")
-                Email_Popup_Popup.title("오류 발생")
-        
-                Popup_Popup_Lable= Label(Email_Popup_Popup,font=fontTitle,text="이메일을 다시 확인해 주세요")
-                Popup_Popup_Lable.pack(expand=True)
-        
-                Popup_Button = Button(Email_Popup_Popup, text="확인", command=Popup_Popup_command)
-                Popup_Button.pack(anchor="s", padx=10, pady=10)
-    else:
-        Email_Popup_Popup = Toplevel(Email_Popup) # popup 띄우기
-        Email_Popup_Popup.geometry("400x150")
-        Email_Popup_Popup.title("오류 발생")
+                main_text="오류 발생"
 
-        error_text = '이메일에 '
+                lable_text="이메일을 다시 확인해 주세요"
+
+                popup_command=Popup_Popup_command
+    else:
+        main_text = "오류 발생"
+
+        lable_text = '이메일에 '
 
         if not '.' in email:
-            error_text += '\'.\' '
+            lable_text += '\'.\' '
         if not '@' in email:
-            error_text += '\'@\' '
+            lable_text += '\'@\' '
 
-        error_text += '(이)가없습니다.'
+        lable_text += '(이)가 없습니다.'
 
-        Popup_Popup_Lable= Label(Email_Popup_Popup,font=fontTitle,text=error_text)
+        Popup_Popup_Lable= Label(Email_Popup_Popup,font=fontTitle,text=lable_text)
         Popup_Popup_Lable.pack(expand=True)
 
-        Popup_Button = Button(Email_Popup_Popup, text="확인", command=Popup_Popup_command)
-        Popup_Button.pack(anchor="s", padx=10, pady=10)
+        popup_command=Popup_Popup_command
         print('예외처리 : 이메일이 아님')
+
+    Email_Popup_Popup = Toplevel(Email_Popup) # popup 띄우기
+    Email_Popup_Popup.geometry("400x150")
+    Email_Popup_Popup.title(main_text)
+    Popup_Popup_Lable= Label(Email_Popup_Popup,font=fontTitle,text=lable_text)
+    Popup_Popup_Lable.pack(expand=True)
+    Popup_Button = Button(Email_Popup_Popup, text="확인", command=popup_command)
+    Popup_Button.pack(anchor="s", padx=10, pady=10)
 
 
 def onEmailPopup():
