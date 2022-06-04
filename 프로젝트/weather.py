@@ -277,9 +277,6 @@ def onEmailInput():
 
         lable_text += '(이)가 없습니다.'
 
-        Popup_Popup_Lable= Label(Email_Popup_Popup,font=fontTitle,text=lable_text)
-        Popup_Popup_Lable.pack(expand=True)
-
         popup_command=Popup_Popup_command
         print('예외처리 : 이메일이 아님')
 
