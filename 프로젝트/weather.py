@@ -113,6 +113,9 @@ def Update():
     #print(response.content)
     items = response.json().get('response').get('body').get('items')
     
+    if weather_list:
+        weather_list = [[],[],[],[],[]]
+
     for item in items['item']:
         if item['category'] =='PTY':    #강수확률- 없음(0), 비(1), 비/눈(2), 눈(3), 빗방울(5), 빗방울눈날림(6), 눈날림(7)
             #print(item['fcstValue'])
@@ -144,6 +147,7 @@ def Update():
     
     Change_Label_Temp()
     Update_map()
+    draw_canvas() # 업데이트할때도 다시 그려야함
 
 #----------------------------etc-----------------------------------
 
@@ -220,9 +224,11 @@ def Search_city():
         City_Name_Lable.config(text=str(name))
         Update()
 
-def draw_graph(data, canvasWidth, canvasHeight):
+def draw_graph(canvasWidth, canvasHeight):
     global canvas
     canvas.delete(corrent_canvas_status) # 기존 그림 지우기
+
+    data = list(map(int, weather_list[2]))
 
     if not len(data): # 데이터 없으면 return
         canvas.create_text(canvasWidth/2,(canvasHeight/2), text="No Data", tags=corrent_canvas_status)
@@ -265,7 +271,9 @@ def draw_canvas():
 
     elif corrent_canvas_status == opposite_status:
         # 여기서 위에 나온 정보들의 그래프를 그린다.
-        draw_graph([670, 900, 150], 580, 240)
+        
+
+        draw_graph(580, 240)
 
 def View_Detail():
     global corrent_canvas_status, next_canvas_status
