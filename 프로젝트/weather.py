@@ -23,8 +23,11 @@ ny = "125"              # 경도 변수
 latitude = NULL         # 지도용 위도 경도
 longitude = NULL
 
-base_date = datetime.today().strftime("%Y%m%d")  # 날짜 변수
-base_time = datetime.today().strftime("%H%M")    # 시간 변수
+base_date = ""
+base_time = ""
+
+weather_list = []
+
 
 Cur_temp = "0"          # 현재 온도    
 items= NULL
@@ -43,7 +46,28 @@ next_canvas_status = opposite_status  # 이 둘은 서로 바뀌어야한다.
 # 그래프 관련 변수
 canvas = NULL
 
+#----------------------------시간 재정의 함수----------------------
 
+def Set_Time():
+    global base_date,base_time
+    if datetime.now().minute <45:
+        if datetime.now().hour==0:
+            base_date= (date.today() - timedelta(days=1)).strftime("%Y%m%d")
+            base_time = "2330"
+        else:
+            pre_hour=datetime.now().hour-1
+            if pre_hour<10:
+                base_time = "0" + str(pre_hour) + "30"
+            else:
+                base_time = str(pre_hour) + "30"
+            base_date= datetime.today().strftime("%Y%m%d")
+
+    else:
+        if datetime.now().hour < 10:
+            base_time = "0" + str(datetime.now().hour) + "30"
+        else:
+            base_time = str(datetime.now().hour) + "30"
+        base_date = datetime.today().strftime("%Y%m%d")
 
 #----------------------------파싱----------------------------------
 
@@ -80,9 +104,7 @@ def Update():
     global base_date, base_time
     global items,Cur_temp
     global base_date,base_time
-    
-    base_date = datetime.today().strftime("%Y%m%d")  # 날짜 변수
-    base_time = datetime.today().strftime("%H%M")    # 시간 변수
+    Set_Time()
     
     params ={'serviceKey' : serviceKey,  'numOfRows' : '1000','pageNo' : '1', 'dataType' : 'JSON', 'base_date' : base_date, 'base_time' : base_time, 'nx' : nx, 'ny' : ny }
     response = requests.get(url, params=params)
