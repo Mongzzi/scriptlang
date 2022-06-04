@@ -3,8 +3,8 @@ from re import L
 from tkinter import *
 import tkinter
 import pickle
+from email.mime.text import MIMEText
 from tkinter import font
-# 초기화를 해주지 않아도 되는 dict
 from collections import defaultdict
 from numpy import true_divide
 import tkintermapview   # 지도를 위한 참조
@@ -164,6 +164,58 @@ def Change_Label_Temp():
     global Cur_temp
     
     Cur_Temp_Lable.config(text="현재 기온{0}".format(Cur_temp +"도"),bg='#FFFF99')
+def rain_condition(n):
+    data = ''
+    if n == '0':
+        data = '비가 오지 않습니다.'
+    elif n == '1':
+        data= '비가 옵니다.'
+    elif n== '2':
+        data= '비/눈이 옵니다.'
+    elif n== '3':
+        data= '눈이 옵니다.'           
+    elif n== '5':
+        data= '빗방울이 떨어집니다.'
+    elif n== '6':
+        data= '빗방울눈날림이 있습니다.'
+    elif n== '7':
+        data= '눈날림이 있습니다.'
+    return data                                
+
+def sky_condition(n):
+    data = ''
+    if n == '1':
+        data = '맑습니다.'
+    elif n == '3':
+        data= '구름이 꼈습니다.'
+    elif n== '4':
+        data= '흐립니다.'
+    return data 
+
+def sendMail(fromAddr,toAddr,msg):
+    import smtplib
+    
+    s= smtplib.SMTP("smtp.gmail.com",587)
+    s.starttls()
+    
+    s.login('hjna0206@gmail.com','yebbawamctnrjdky')
+    s.sendmail(fromAddr,[toAddr],msg.as_string())
+    s.close()
+
+def Send_Mail():
+    global Email_Entry
+    global base_date,base_time,weather_list
+    
+    #[0] = 강수확률 [1] = 강수량 [2] = 온도 [3] =습도 [4] = 하늘상태
+    #강수확률- 없음(0), 비(1), 비/눈(2), 눈(3), 빗방울(5), 빗방울눈날림(6), 눈날림(7)
+
+        
+    show_data = base_date + '\n' + base_time +'\n' + '강수확률 = '+str(rain_condition(weather_list[0][0])+ '\n강수량 = '+ weather_list[1][0] +'\n현재온도 = ' 
+                                                                   + weather_list[2][0]+'도'+'\n현재습도 = '+weather_list[3][0]+'%'+'\n현재 하늘상태 = '+str(sky_condition(weather_list[4][0])))
+    
+    msg=MIMEText(show_data)
+    msg['Subject']= '날씨 정보'
+    sendMail('hjna0206@gmail.com',Email_Entry.get(),msg)
 
 #------------------------검색 함수----------------------------------
 
@@ -350,9 +402,11 @@ City_Name_Lable.pack(side="left",padx=10,fill="both")
 # Low_Temp_Lable= Label(Frame_etc,font=fontNormal,borderwidth=3,relief='groove',text="최저 기온 {0}".format(Cur_temp+"도"),bg='#FFFF99')
 # Low_Temp_Lable.pack(side="left",padx=10,fill="both")
 
-Send_Email_Button = Button(Frame_etc,font=fontNormal,image=mail_img)
+Send_Email_Button = Button(Frame_etc,font=fontNormal,image=mail_img,command=Send_Mail)
 Send_Email_Button.pack(side="right",padx=10,fill="both")
 
+Email_Entry= Entry(Frame_etc,font=fontNormal,borderwidth=10,relief='ridge')
+Email_Entry.pack(side="right",padx=10)
 
 View_Detail_Button= Button(Frame_etc,width=13,font=fontNormal,text=next_canvas_status,command=View_Detail)
 View_Detail_Button.pack(side="right",padx=10,fill="both")
