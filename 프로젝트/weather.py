@@ -194,7 +194,6 @@ def sky_condition(n):
 
 def sendMail(fromAddr,toAddr,msg):
     import smtplib
-    
     s= smtplib.SMTP("smtp.gmail.com",587)
     s.starttls()
     
@@ -216,35 +215,96 @@ def make_data():
     + '\n현재 하늘상태 = '+str(sky_condition(weather_list[4][0])))\
     
 
+def Popup_Popup_command():
+    global Email_Popup_Popup
+    Email_Popup_Popup.destroy()
+
+
+def Popup_Popup_command_2():
+    global Email_Popup_Popup, Email_Popup
+
+    Email_Popup_Popup.destroy()
+    Email_Popup.destroy() # popup 내리기
+
+
+
 def onEmailInput():
     global Email_Entry
     global base_date,base_time,weather_list
+    global Email_Popup, Email_Popup_Popup, Popup_Popup_Lable, Popup_Popup_Button
     
     #[0] = 강수확률 [1] = 강수량 [2] = 온도 [3] =습도 [4] = 하늘상태
     #강수확률- 없음(0), 비(1), 비/눈(2), 눈(3), 빗방울(5), 빗방울눈날림(6), 눈날림(7)
+    email = Email_Entry.get()
     
-    show_data = make_data()
+    # 이메일 검사
+    Email_Flag = False
 
-    print(show_data)
+    if '.' in email and '@' in email:
+            Email_Flag = True
 
-    msg=MIMEText(show_data)
-    msg['Subject']= '날씨 정보'
-    # sendMail('hjna0206@gmail.com',Email_Entry.get(),msg)
-    popup.destroy() # popup 내리기
+    if Email_Flag:
+        if email:
+            show_data = make_data()
+            # print(show_data)
+            msg=MIMEText(show_data)
+            msg['Subject']= '날씨 정보'
+            try:
+                sendMail('hjna0206@gmail.com',email,msg)
+
+                Email_Popup_Popup = Toplevel(Email_Popup) # popup 띄우기
+                Email_Popup_Popup.geometry("400x150")
+                Email_Popup_Popup.title("발송 성공")
+
+                Popup_Popup_Lable= Label(Email_Popup_Popup,font=fontTitle,text="아마도 성공")
+                Popup_Popup_Lable.pack(expand=True)
+
+                Popup_Button = Button(Email_Popup_Popup, text="확인", command=Popup_Popup_command_2)
+                Popup_Button.pack(anchor="s", padx=10, pady=10)
+            except:
+                Email_Popup_Popup = Toplevel(Email_Popup) # popup 띄우기
+                Email_Popup_Popup.geometry("400x150")
+                Email_Popup_Popup.title("오류 발생")
+        
+                Popup_Popup_Lable= Label(Email_Popup_Popup,font=fontTitle,text="이메일을 다시 확인해 주세요")
+                Popup_Popup_Lable.pack(expand=True)
+        
+                Popup_Button = Button(Email_Popup_Popup, text="확인", command=Popup_Popup_command)
+                Popup_Button.pack(anchor="s", padx=10, pady=10)
+    else:
+        Email_Popup_Popup = Toplevel(Email_Popup) # popup 띄우기
+        Email_Popup_Popup.geometry("400x150")
+        Email_Popup_Popup.title("오류 발생")
+
+        error_text = '이메일에 '
+
+        if not '.' in email:
+            error_text += '\'.\' '
+        if not '@' in email:
+            error_text += '\'@\' '
+
+        error_text += '(이)가없습니다.'
+
+        Popup_Popup_Lable= Label(Email_Popup_Popup,font=fontTitle,text=error_text)
+        Popup_Popup_Lable.pack(expand=True)
+
+        Popup_Button = Button(Email_Popup_Popup, text="확인", command=Popup_Popup_command)
+        Popup_Button.pack(anchor="s", padx=10, pady=10)
+        print('예외처리 : 이메일이 아님')
 
 
 def onEmailPopup():
-    global root, popup
-    popup = Toplevel(root) # popup 띄우기
-    popup.geometry("300x150")
-    popup.title("받을 이메일 주소 입력")
+    global root, Email_Popup
+    Email_Popup = Toplevel(root) # popup 띄우기
+    Email_Popup.geometry("300x150")
+    Email_Popup.title("받을 이메일 주소 입력")
 
-    global Email_Entry, btnEmail
-    Email_Entry = Entry(popup, width = 200,)
+    global Email_Entry, Popup_Button
+    Email_Entry = Entry(Email_Popup, width = 200,)
     Email_Entry.pack(fill='x', padx=10, expand=True)
 
-    btnEmail = Button(popup, text="보내기", command=onEmailInput)
-    btnEmail.pack(anchor="s", padx=10, pady=10)
+    Popup_Button = Button(Email_Popup, text="보내기", command=onEmailInput)
+    Popup_Button.pack(anchor="s", padx=10, pady=10)
 
 #------------------------검색 함수----------------------------------
 
@@ -452,7 +512,8 @@ City_Name_Lable.pack(side="left",padx=10,fill="both")
 Send_Email_Button = Button(Frame_etc,font=fontNormal,image=mail_img,command=onEmailPopup)
 Send_Email_Button.pack(side="right",padx=10,fill="both")
 
-popup = Email_Entry = btnEmail = None # 이메일 팝업에 사용
+Email_Popup = Email_Entry = Popup_Button = None # 이메일 팝업에 사용
+Email_Popup_Popup = Popup_Popup_Lable = Popup_Popup_Button = None    # 이메일 팝업의 팝업에 활용
 
 View_Detail_Button= Button(Frame_etc,width=13,font=fontNormal,text=next_canvas_status,command=View_Detail)
 View_Detail_Button.pack(side="right",padx=10,fill="both")
