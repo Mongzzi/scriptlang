@@ -1,5 +1,7 @@
 from dice import *
 
+Full_House_Flag = True
+
 class Configuration:
 
     configs = [
@@ -58,7 +60,7 @@ class Configuration:
         if row == 10:
             if 3 in number_of_each_dice and 2 in number_of_each_dice:
                 return_score = 25
-            elif 5 in number_of_each_dice:  # 이거는 좀 애매하다.
+            if Full_House_Flag and 5 in number_of_each_dice:
                 return_score = 25
         # 스스
         if row == 11:
