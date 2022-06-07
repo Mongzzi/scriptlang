@@ -14,24 +14,20 @@ import noti
 # 기존 앱 코드에서 함수만 가져와본다.
 import common_functions
 
-# date_param: 날짜, user: 사용자ID, loc_param:지역코드
-def replyAptData(date_param, user, loc_param='11710'):
-    print(user, date_param, loc_param)
-    res_list = noti.getData( loc_param, date_param )
-# 하나씩 보내면 메세지 개수가 너무 많아지므로
-# 300자까지는 하나의 메세지로 묶어서 보내기.
-    msg = ''
-    for r in res_list:
-        print( str(datetime.now()).split('.')[0], r )
-        if len(r+msg)+1>noti.MAX_MSG_LENGTH:
-            noti.sendMessage( user, msg )
-            msg = r+'\n'
-        else:
-            msg += r+'\n'
-    if msg:
-        noti.sendMessage( user, msg )
-    else:
-        noti.sendMessage( user, '%s 기간에 해당하는 데이터가 없습니다.'%date_param )
+# 튜플을 받음. 순서대로 nx, ny, latitude, longitude
+def replyAptData( num, user ):
+    global return_lsit
+
+    adr_tuple = return_lsit[int(num) - 1]
+    name, (nx, ny, latitude, longitude) = adr_tuple
+    print(adr_tuple)
+
+    weather_list = noti.getData( nx, ny )
+    print(weather_list)
+    
+    base_date, base_time = common_functions.Set_Time()
+
+    noti.sendMessage( user, common_functions.make_data(name, base_date, base_time, weather_list))
 
 def save( user, loc_param ):
     conn = sqlite3.connect('users.db')
@@ -64,12 +60,10 @@ def handle(msg):
         return
     text = msg['text']
     args = text.split(' ')
-    if text.startswith('거래') and len(args)>1:
-        print('try to 거래', args[1])
-        replyAptData( args[1], chat_id, args[2] )
-    elif text.startswith('지역') and len(args)>1:
-        print('try to 지역', args[1])
-        replyAptData( '202205', chat_id, args[1] )
+    if text.startswith('날씨') and len(args)>1:
+        print('try to 날씨', args[1])
+        replyAptData(args[1], chat_id)
+        pass
     elif text.startswith('저장') and len(args)>1:
         print('try to 저장', args[1])
         save( chat_id, args[1] )
@@ -80,8 +74,15 @@ def handle(msg):
         print('try to 검색', args[1])
         return_lsit = common_functions.Get_Name_Val_From_Dict(args[1], adress_dict)
         noti.sendMessage( chat_id, str(len(return_lsit))+'개 지역 검색' )
-        # for name, val in return_lsit:
-            # noti.sendMessage( chat_id, str(name)+ ', ' + str(val) )
+    elif text.startswith('검색확인'):
+        print('try to 검색확인')
+        text = ''
+        count = 1
+        for name, val in return_lsit:   # 포멧을 사용해보자.
+            text += str(name)+', '
+            if count % 4 == 0:
+                text += '\n'
+        noti.sendMessage( chat_id, text )
     elif text.startswith('안녕'):
         print('try to 안녕')
         noti.sendMessage( chat_id, '뭘봐' )

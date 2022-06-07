@@ -7,8 +7,7 @@ from tkinter import font
 from collections import defaultdict
 from numpy import true_divide
 import tkintermapview   # 지도를 위한 참조
-import datetime # 날짜시간 모듈
-from datetime import date, datetime, timedelta  # 현재 날짜 외의 날짜 구하기 위한 모듈
+
 
 import common_functions
 
@@ -50,27 +49,6 @@ canvas = NULL
 
 #----------------------------시간 재정의 함수----------------------
 
-def Set_Time():
-    global base_date,base_time
-    if datetime.now().minute <45:
-        if datetime.now().hour==0:
-            base_date= (date.today() - timedelta(days=1)).strftime("%Y%m%d")
-            base_time = "2330"
-        else:
-            pre_hour=datetime.now().hour-1
-            if pre_hour<10:
-                base_time = "0" + str(pre_hour) + "30"
-            else:
-                base_time = str(pre_hour) + "30"
-            base_date= datetime.today().strftime("%Y%m%d")
-
-    else:
-        if datetime.now().hour < 10:
-            base_time = "0" + str(datetime.now().hour) + "30"
-        else:
-            base_time = str(datetime.now().hour) + "30"
-        base_date = datetime.today().strftime("%Y%m%d")
-
 
 #----------------------------파싱----------------------------------
 
@@ -107,7 +85,7 @@ def Update():
     global base_date, base_time
     global items,Cur_temp
     global base_date,base_time,weather_list
-    Set_Time()
+    base_date, base_time = common_functions.Set_Time()
     
     params ={'serviceKey' : serviceKey,  'numOfRows' : '1000','pageNo' : '1', 'dataType' : 'JSON', 'base_date' : base_date, 'base_time' : base_time, 'nx' : nx, 'ny' : ny }
     response = requests.get(url, params=params)
@@ -163,33 +141,7 @@ def Change_Label_Temp():
     global Cur_temp
     
     Cur_Temp_Lable.config(text="현재 기온{0}".format(Cur_temp +"도"),bg='#FFFF99')
-def rain_condition(n):
-    data = ''
-    if n == '0':
-        data = '비가 오지 않습니다.'
-    elif n == '1':
-        data= '비가 옵니다.'
-    elif n== '2':
-        data= '비/눈이 옵니다.'
-    elif n== '3':
-        data= '눈이 옵니다.'           
-    elif n== '5':
-        data= '빗방울이 떨어집니다.'
-    elif n== '6':
-        data= '빗방울눈날림이 있습니다.'
-    elif n== '7':
-        data= '눈날림이 있습니다.'
-    return data                                
 
-def sky_condition(n):
-    data = ''
-    if n == '1':
-        data = '맑습니다.'
-    elif n == '3':
-        data= '구름이 꼈습니다.'
-    elif n== '4':
-        data= '흐립니다.'
-    return data 
 
 def sendMail(fromAddr,toAddr,msg):
     import smtplib
@@ -199,19 +151,6 @@ def sendMail(fromAddr,toAddr,msg):
     s.login('hjna0206@gmail.com','yebbawamctnrjdky')
     s.sendmail(fromAddr,[toAddr],msg.as_string())
     s.close()
-
-
-def make_data():
-    global base_date,base_time,weather_list
-
-    return '오늘의 날자 ' + base_date + '\n'\
-    + str(int(base_time)//100) + '시' + str(int(base_time)%100) + '분의 '\
-    + City_Name_Lable['text']+'의 날씨입니다.\n'\
-    + '강수확률 = ' + str(rain_condition(weather_list[0][0])\
-    + '\n강수량 = '+ weather_list[1][0] \
-    + '\n현재온도 = ' + weather_list[2][0]+'도'\
-    + '\n현재습도 = '+weather_list[3][0]+'%'\
-    + '\n현재 하늘상태 = '+str(sky_condition(weather_list[4][0])))\
     
 
 def Popup_Popup_command():
@@ -228,6 +167,7 @@ def Popup_Popup_command_2():
 
 
 def onEmailInput():
+    global name
     global Email_Entry
     global base_date,base_time,weather_list
     global Email_Popup, Email_Popup_Popup, Popup_Popup_Lable, Popup_Popup_Button
@@ -247,7 +187,7 @@ def onEmailInput():
 
     if Email_Flag:
         if email:
-            show_data = make_data()
+            show_data = common_functions.make_data(name, base_date,base_time,weather_list)
             # print(show_data)
             msg=MIMEText(show_data)
             msg['Subject']= '날씨 정보'
@@ -301,6 +241,7 @@ def onEmailPopup():
     Popup_Button = Button(Email_Popup, text="보내기", command=onEmailInput)
     Popup_Button.pack(anchor="s", padx=10, pady=10)
 
+name = None
 
 def Search_city():
     global cities
@@ -310,10 +251,10 @@ def Search_city():
     global nx, ny
     global items, Max_temp
     global latitude, longitude
+    global name
     for_search = Search_Entry.get()
 
     val = NULL
-    name = NULL
 
     return_lsit = common_functions.Get_Name_Val_From_Dict(for_search, adress_dict)
     name, val = return_lsit[0]

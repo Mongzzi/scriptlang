@@ -9,7 +9,7 @@ import traceback
 from xml.etree import ElementTree
 from xml.dom.minidom import parseString
 
-
+import common_functions
 
 
 #-------------------------------------------------------------------------------------------------
@@ -34,37 +34,13 @@ base_time = ""
 
 #-------------------------------------------------------------------------------------------------
 
-def Set_Time():
-    global base_date,base_time
-    if datetime.now().minute <45:
-        if datetime.now().hour==0:
-            base_date= (date.today() - timedelta(days=1)).strftime("%Y%m%d")
-            base_time = "2330"
-        else:
-            pre_hour=datetime.now().hour-1
-            if pre_hour<10:
-                base_time = "0" + str(pre_hour) + "30"
-            else:
-                base_time = str(pre_hour) + "30"
-            base_date= datetime.today().strftime("%Y%m%d")
-
-    else:
-        if datetime.now().hour < 10:
-            base_time = "0" + str(datetime.now().hour) + "30"
-        else:
-            base_time = str(datetime.now().hour) + "30"
-        base_date = datetime.today().strftime("%Y%m%d")
-
-#-------------------------------------------------------------------------------------------------
-
-def getData():
+def getData(nx, ny):
     
-    Set_Time()
+    base_date,base_time = common_functions.Set_Time()
     params ={'serviceKey' : key,  'numOfRows' : '1000','pageNo' : '1', 'dataType' : 'JSON', 'base_date' : base_date, 'base_time' : base_time, 'nx' : nx, 'ny' : ny }
     response = requests.get(url, params=params)
     items = response.json().get('response').get('body').get('items')
     
-    res_list = []
     weather_list = [[],[],[],[],[]]
 
     for item in items['item']:
@@ -88,7 +64,7 @@ def getData():
             cnt=4
             weather_list[cnt].append(item['fcstValue'])
             
-        return weather_list
+    return weather_list
 
 def sendMessage(user, msg):
     try:
