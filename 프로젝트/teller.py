@@ -24,7 +24,7 @@ def replyAptData( num, user ):
 
     weather_list = noti.getData( nx, ny )
     print(weather_list)
-    
+
     base_date, base_time = common_functions.Set_Time()
 
     noti.sendMessage( user, common_functions.make_data(name, base_date, base_time, weather_list))
@@ -62,7 +62,15 @@ def handle(msg):
     args = text.split(' ')
     if text.startswith('날씨') and len(args)>1:
         print('try to 날씨', args[1])
-        replyAptData(args[1], chat_id)
+        num_of_data = len(return_lsit)
+        if num_of_data:
+            if num_of_data < args[1]:
+                replyAptData(args[1], chat_id)
+            else:
+                noti.sendMessage( chat_id, '검색된 지역의 수 보다 높은 번호를 불렀습니다.' )
+                noti.sendMessage( chat_id, '현재 검색된 지역의 수는 '+str(num_of_data)+'입니다' )
+        else:
+            noti.sendMessage( chat_id, '검색된 지역이 없습니다.\n다른 값을 검색해 보세요' )
         pass
     elif text.startswith('저장') and len(args)>1:
         print('try to 저장', args[1])
@@ -73,22 +81,51 @@ def handle(msg):
     elif text.startswith('검색') and len(args)>1:
         print('try to 검색', args[1])
         return_lsit = common_functions.Get_Name_Val_From_Dict(args[1], adress_dict)
-        noti.sendMessage( chat_id, str(len(return_lsit))+'개 지역 검색' )
+        num_of_data = len(return_lsit)
+        if num_of_data:
+            noti.sendMessage( chat_id, str(num_of_data)+'개 지역 검색' )
+        else:
+            noti.sendMessage( chat_id, '검색된 지역이 없습니다.\n다른 값을 검색해 보세요' )
+
     elif text.startswith('검색확인'):
         print('try to 검색확인')
-        text = ''
-        count = 1
-        for name, val in return_lsit:   # 포멧을 사용해보자.
-            text += str(name)+', '
-            if count % 4 == 0:
-                text += '\n'
-        noti.sendMessage( chat_id, text )
-    elif text.startswith('안녕'):
-        print('try to 안녕')
-        noti.sendMessage( chat_id, '뭘봐' )
+        num_of_data = len(return_lsit)
+        if num_of_data:
+            text = ''
+            count = 1
+            for name, val in return_lsit:   # 포멧을 사용해보자.
+                text += str(name)+', '
+                if count % 4 == 0:
+                    text += '\n'
+            noti.sendMessage( chat_id, text )
+        else:
+            noti.sendMessage( chat_id, '검색된 지역이 없습니다.' )
+
+    elif text.startswith('?'):
+        print('try to ?')
+        noti.sendMessage(chat_id,
+'''명령어 모음입니다.
+날씨 [검색된 지역의 수 이하의 숫자]
+ - 해당하는 지역의 날씨를 출력합니다
+
+저장 [저장할 단어]
+ - 입력 단어를 저장합니다
+
+확인
+ - 저장 단어를 전부 다 불러옵니다
+
+검색 [검색할 지역에 포함된 단어]
+ - 입력한 단어가 포함된 지역을 전부 검색합니다
+
+검색확인
+ - 검색한 지역들을 출력합니다.
+
+중 하나의 명령을 입력하세요.]
+''')
     else:
-        noti.sendMessage(chat_id, '''모르는 명령어입니다.\n거래 [YYYYMM] [지역번호]
-\n지역 [지역번호]\n저장 [지역번호]\n확인 중 하나의 명령을 입력하세요.]
+        noti.sendMessage(chat_id,
+'''모르는 명령어 이거나 잘못된 입력입니다.
+명령어들의 사용법이 궁금하시면 ? 를 입력해 주세요
 ''')
 
 return_lsit = None  #검색한 단어가 들어간 지역들의 리스트
