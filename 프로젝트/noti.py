@@ -9,34 +9,86 @@ import traceback
 from xml.etree import ElementTree
 from xml.dom.minidom import parseString
 
-key = 'ZuzmMcb5viQ3a2SApJ8lHnLxu0st3sTXRGVXlEtlL8bh62SZjKNRTMgjbh0sLpxIjNR5h9ShzPoE1Jg%2FpXQUiQ%3D%3D'
+
+
+
+#-------------------------------------------------------------------------------------------------
+import datetime # 날짜시간 모듈
+from datetime import date, datetime, timedelta  # 현재 날짜 외의 날짜 구하기 위한 모듈
+import requests # HTTP 요청을 보내는 모듈
+import json
+url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst'
+key = 'nROKr9gqJ/zCVFiZhf/2PKCFTXCSUm3R4tzU4lLbQg9ehw7c1UnINQL413EYxPvHfVUaPVAkTMaSWabh11bt8Q=='
+
+#-------------------------------------------------------------------------------------------------
+
 TOKEN = '5518030601:AAGxOIZJyz8Vc2hDBoSYPzrUSgoWOueBdMY'
 MAX_MSG_LENGTH = 300
-baseurl = 'http://openapi.molit.go.kr:8081/OpenAPI_ToolInstallPackage/service/rest/RTM'\
-'SOBJSvc/getRTMSDataSvcAptTrade?ServiceKey='+key
+
+#-------------------------------------------------------------------------------------------------
+
+
 bot = telepot.Bot(TOKEN)
+base_date = ""
+base_time = ""
 
-def getData(loc_param, date_param):
+#-------------------------------------------------------------------------------------------------
+
+def Set_Time():
+    global base_date,base_time
+    if datetime.now().minute <45:
+        if datetime.now().hour==0:
+            base_date= (date.today() - timedelta(days=1)).strftime("%Y%m%d")
+            base_time = "2330"
+        else:
+            pre_hour=datetime.now().hour-1
+            if pre_hour<10:
+                base_time = "0" + str(pre_hour) + "30"
+            else:
+                base_time = str(pre_hour) + "30"
+            base_date= datetime.today().strftime("%Y%m%d")
+
+    else:
+        if datetime.now().hour < 10:
+            base_time = "0" + str(datetime.now().hour) + "30"
+        else:
+            base_time = str(datetime.now().hour) + "30"
+        base_date = datetime.today().strftime("%Y%m%d")
+
+#-------------------------------------------------------------------------------------------------
+
+def getData():
+    
+    Set_Time()
+    params ={'serviceKey' : key,  'numOfRows' : '1000','pageNo' : '1', 'dataType' : 'JSON', 'base_date' : base_date, 'base_time' : base_time, 'nx' : nx, 'ny' : ny }
+    response = requests.get(url, params=params)
+    items = response.json().get('response').get('body').get('items')
+    
     res_list = []
-    url = baseurl+'&LAWD_CD='+loc_param+'&DEAL_YMD='+date_param
-    res_body = urlopen(url).read()
-    strXml = res_body.decode('utf-8')
-    tree = ElementTree.fromstring(strXml)
+    weather_list = [[],[],[],[],[]]
 
-    items = tree.iter("item") # return list type
-    for item in items:
-        amount = item.find("거래금액").text.strip()
-        build = item.find("건축년도").text
-        y = item.find("년").text
-        dong = item.find("법정동").text
-        apt = item.find("아파트").text
-        m = item.find("월").text
-        d = item.find("일").text
-        n = item.find("전용면적").text
-        row = y + '/' + m + '/' + d + ', ' + dong + ' ' + apt + '(' \
-            + build+') ' + n + 'm², ' + amount + '만원'
-        res_list.append(row)
-    return res_list
+    for item in items['item']:
+        if item['category'] =='PTY':    #강수확률- 없음(0), 비(1), 비/눈(2), 눈(3), 빗방울(5), 빗방울눈날림(6), 눈날림(7)
+            cnt=0
+            weather_list[cnt].append(item['fcstValue'])
+            
+        if item['category'] =='RN1':    #1시간 강수량
+            cnt=1
+            weather_list[cnt].append(item['fcstValue'])
+            
+        if item['category'] =='T1H':    #온도
+            cnt=2
+            weather_list[cnt].append(item['fcstValue'])
+            
+        if item['category'] =='REH':    #습도
+            cnt=3
+            weather_list[cnt].append(item['fcstValue'])
+            
+        if item['category'] =='SKY':    #하늘상태- 맑음(1), 구름많음(3), 흐림(4)
+            cnt=4
+            weather_list[cnt].append(item['fcstValue'])
+            
+        return weather_list
 
 def sendMessage(user, msg):
     try:
