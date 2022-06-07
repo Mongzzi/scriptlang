@@ -150,9 +150,12 @@ def Update():
     draw_canvas() # 업데이트할때도 다시 그려야함
 
 #----------------------------etc-----------------------------------
+adress_dict = None
+def Read_Adress_From_File():
+    global adress_dict
 
-f = open('adress', 'rb') #pickle 사용을 위해 바이너리 읽기 파일 오픈
-adress_dict = pickle.load(f) #파일에서 리스트 load
+    f = open('adress', 'rb') #pickle 사용을 위해 바이너리 읽기 파일 오픈
+    adress_dict = pickle.load(f) #파일에서 리스트 load
 
 cities = ["서울","부산","경기","인천"]
 mail_img= PhotoImage(file=r"scriptlang\프로젝트\mail_640_416.png")
@@ -303,6 +306,30 @@ def onEmailPopup():
     Popup_Button.pack(anchor="s", padx=10, pady=10)
 
 #------------------------검색 함수----------------------------------
+def Get_Name_Val_From_Dict(for_search):
+    flag = False
+    
+    return_lsit = []
+
+    for adress in adress_dict['level_3']:
+        if flag: break
+        if adress != None and for_search in adress:
+            return_lsit.append((adress, adress_dict['level_3'][adress]))
+            # flag = TRUE
+    
+    for adress in adress_dict['level_2']:
+        if flag: break
+        if adress != None and for_search in adress:
+            return_lsit.append((adress, adress_dict['level_2'][adress]))
+            # flag = TRUE
+
+    for adress in adress_dict['level_1']:
+        if flag: break
+        if adress != None and for_search in adress:
+            return_lsit.append((adress, adress_dict['level_1'][adress]))
+            # flag = TRUE
+
+    return return_lsit
 
 def Search_city():
     global cities
@@ -316,36 +343,11 @@ def Search_city():
 
     val = NULL
     name = NULL
-    flag = False
 
-    import pprint
+    return_lsit = Get_Name_Val_From_Dict(for_search)
+    name, val = return_lsit[0]
     
-    for adress in adress_dict['level_3']:
-        if flag: break
-        if adress != None and for_search in adress:
-            name = adress
-            val = adress_dict['level_3'][adress]
-            flag = TRUE
-    
-    for adress in adress_dict['level_2']:
-        if flag: break
-        if adress != None and for_search in adress:
-            name = adress
-            val = adress_dict['level_2'][adress]
-            flag = TRUE
-
-    for adress in adress_dict['level_1']:
-        if flag: break
-        if adress != None and for_search in adress:
-            name = adress
-            val = adress_dict['level_1'][adress]
-            print(val)
-            flag = TRUE
-                    # val 가 튜플임. 순서대로 X, Y, 위도, 경도
-                    # 사용 예시         nx, ny, latitude, longitude = val
-                    # name 는 그 지역의 이름.
-
-    if not flag:
+    if not len(return_lsit):
         City_Name_Lable.config(text=str(for_search)+" 찾지 못함")
         print(for_search)
         print("찾지 못 함")
@@ -525,6 +527,9 @@ draw_canvas() # 한번 먼저 그려놓는다
     # 지도 레이블
 map_widget = tkintermapview.TkinterMapView(Frame_map, width=800, height=500, corner_radius=0)
 map_widget.pack()
+
+
+Read_Adress_From_File()
 
 root.mainloop()
 
