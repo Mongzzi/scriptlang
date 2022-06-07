@@ -12,7 +12,7 @@ from datetime import date, datetime
 import noti
 
 # 기존 앱 코드에서 함수만 가져와본다.
-import weather
+import common_functions
 
 # date_param: 날짜, user: 사용자ID, loc_param:지역코드
 def replyAptData(date_param, user, loc_param='11710'):
@@ -78,7 +78,7 @@ def handle(msg):
         check( chat_id )
     elif text.startswith('검색') and len(args)>1:
         print('try to 검색', args[1])
-        return_lsit = weather.Get_Name_Val_From_Dict(args[1])
+        return_lsit = common_functions.Get_Name_Val_From_Dict(args[1], adress_dict)
         noti.sendMessage( chat_id, str(len(return_lsit))+'개 지역 검색' )
         # for name, val in return_lsit:
             # noti.sendMessage( chat_id, str(name)+ ', ' + str(val) )
@@ -92,8 +92,7 @@ def handle(msg):
 
 return_lsit = None  #검색한 단어가 들어간 지역들의 리스트
 
-adress_dict = None
-weather.Read_Adress_From_File()
+adress_dict = common_functions.Read_Adress_From_File()
 
 today = date.today()
 current_month = today.strftime('%Y%m')

@@ -2,7 +2,6 @@ from asyncio.windows_events import NULL
 from re import L
 from tkinter import *
 import tkinter
-import pickle
 from email.mime.text import MIMEText
 from tkinter import font
 from collections import defaultdict
@@ -10,6 +9,8 @@ from numpy import true_divide
 import tkintermapview   # 지도를 위한 참조
 import datetime # 날짜시간 모듈
 from datetime import date, datetime, timedelta  # 현재 날짜 외의 날짜 구하기 위한 모듈
+
+import common_functions
 
 root = Tk()
 root.geometry("600x700+600+100")
@@ -151,13 +152,8 @@ def Update():
 
 #----------------------------etc-----------------------------------
 adress_dict = None
-def Read_Adress_From_File():
-    global adress_dict
 
-    f = open('adress', 'rb') #pickle 사용을 위해 바이너리 읽기 파일 오픈
-    adress_dict = pickle.load(f) #파일에서 리스트 load
-
-cities = ["서울","부산","경기","인천"]
+# cities = ["서울","부산","경기","인천"]
 mail_img= PhotoImage(file=r"scriptlang\프로젝트\mail_640_416.png")
 weather_top_img=PhotoImage(file=r"scriptlang\프로젝트\weather_top.PNG")
 weather_bottom_img=PhotoImage(file=r"scriptlang\프로젝트\weather_bottom.PNG")
@@ -305,31 +301,6 @@ def onEmailPopup():
     Popup_Button = Button(Email_Popup, text="보내기", command=onEmailInput)
     Popup_Button.pack(anchor="s", padx=10, pady=10)
 
-#------------------------검색 함수----------------------------------
-def Get_Name_Val_From_Dict(for_search):
-    flag = False
-    
-    return_lsit = []
-
-    for adress in adress_dict['level_3']:
-        if flag: break
-        if adress != None and for_search in adress:
-            return_lsit.append((adress, adress_dict['level_3'][adress]))
-            # flag = TRUE
-    
-    for adress in adress_dict['level_2']:
-        if flag: break
-        if adress != None and for_search in adress:
-            return_lsit.append((adress, adress_dict['level_2'][adress]))
-            # flag = TRUE
-
-    for adress in adress_dict['level_1']:
-        if flag: break
-        if adress != None and for_search in adress:
-            return_lsit.append((adress, adress_dict['level_1'][adress]))
-            # flag = TRUE
-
-    return return_lsit
 
 def Search_city():
     global cities
@@ -344,7 +315,7 @@ def Search_city():
     val = NULL
     name = NULL
 
-    return_lsit = Get_Name_Val_From_Dict(for_search)
+    return_lsit = common_functions.Get_Name_Val_From_Dict(for_search, adress_dict)
     name, val = return_lsit[0]
     
     if not len(return_lsit):
@@ -528,8 +499,8 @@ draw_canvas() # 한번 먼저 그려놓는다
 map_widget = tkintermapview.TkinterMapView(Frame_map, width=800, height=500, corner_radius=0)
 map_widget.pack()
 
+if __name__ == '__main__':
+    adress_dict = common_functions.Read_Adress_From_File()
 
-Read_Adress_From_File()
-
-root.mainloop()
+    root.mainloop()
 
