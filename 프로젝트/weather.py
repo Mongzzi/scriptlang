@@ -301,8 +301,11 @@ def draw_graph(canvasWidth, canvasHeight):
     rectWidth = (canvasWidth // nData) # 데이터 1개의 폭.
     percentage_of_rect = 1 / 2  # 폭의 기둥의 비율
     
+    # bottom = canvasHeight - 50 # bar의 bottom 위치 
     bottom = canvasHeight - 50 # bar의 bottom 위치 
     maxheight = canvasHeight - 70 # bar의 최대 높이.(위/아래 각각 50씩 여유.  표 아래에 정보를 추가 할 때마다 15씩 늘일것)
+
+    coordinates = [] # 꺾은선 그래프를 위한 정보.
 
     for i in range(nData): # 각 데이터에 대해..
         # max/min은 특별한 색으로.
@@ -310,12 +313,15 @@ def draw_graph(canvasWidth, canvasHeight):
         elif nMin == data[i]: color='blue'
         else: color="grey"
         
-        curHeight = maxheight * data[i] / nMax # 최대값에 대한 비율 반영
+        # curHeight = maxheight * data[i] / nMax # 최대값에 대한 비율 반영 막대그래프
+        curHeight = maxheight * ((data[i] - nMin)/(nMax - nMin)) # 꺾은선 그래프를 위한 비율
         top = bottom - curHeight # bar의 top 위치
         left = size_of_infomation + i * rectWidth + rectWidth * (1 - percentage_of_rect) / 2 # bar의 left 위치
         right = size_of_infomation + (i + 1) * rectWidth - rectWidth * (1 - percentage_of_rect) / 2# bar의 right 위치
-        canvas.create_rectangle(left, top, right, bottom, fill=color, tag=corrent_canvas_status, activefill='yellow')
+        # canvas.create_rectangle(left, top, right, bottom, fill=color, tag=corrent_canvas_status, activefill='yellow')
+        middle = (right+left)/2
 
+        coordinates.append((top, middle))
         # 온도
         canvas.create_text((left+right)//2, top-10, text=data[i], tags=corrent_canvas_status)
         # 시간
@@ -327,6 +333,25 @@ def draw_graph(canvasWidth, canvasHeight):
         canvas.create_text((left+right)//2, bottom+25, text=weather_list[0][i], tags=corrent_canvas_status)
         # 강수량
         canvas.create_text((left+right)//2, bottom+40, text=weather_list[1][i], tags=corrent_canvas_status)
+
+    for i in range(nData-1): # 막대
+        color = 'black'
+
+        top , middle = coordinates[i]
+        next_top , next_middle = coordinates[i+1]
+        canvas.create_line(middle, top, next_middle,next_top,fill=color, width = 3, tag=corrent_canvas_status)
+    
+    for i in range(nData): # 원
+        if nMax == data[i]: color="red"
+        elif nMin == data[i]: color='blue'
+        else: color="grey"
+        top, middle = coordinates[i]
+
+        r = 4
+
+        canvas.create_oval(middle-r,top-r,middle+r,top+r, fill=color, tag=corrent_canvas_status, activefill='yellow')
+
+
 
     canvas.create_text(30, bottom-10, text='온도', tags=corrent_canvas_status)
     canvas.create_text(30, bottom+10, text='시간', tags=corrent_canvas_status)

@@ -69,7 +69,7 @@ def handle(msg):
             if args[1] == '전부':
                 for i in range(num_of_data):
                     replyAptData(i+1, chat_id)
-            elif num_of_data >= int(args[1]):
+            elif num_of_data >= int(args[1]) > 0:
                 replyAptData(str(int(args[1])), chat_id)
             else:
                 noti.sendMessage( chat_id, '검색된 지역의 수 보다 높은 번호를 불렀습니다.' )
