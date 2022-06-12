@@ -62,16 +62,30 @@ def handle(msg):
     args = text.split(' ')
     if text.startswith('날씨') and len(args)>1:
         print('try to 날씨', args[1])
+        if return_lsit == None:
+            noti.sendMessage( chat_id, '검색된 지역이 없습니다.\n다른 값을 검색해 보세요' )
         num_of_data = len(return_lsit)
         if num_of_data:
-            if num_of_data < args[1]:
-                replyAptData(args[1], chat_id)
+            if args[1] == '전부':
+                for i in range(num_of_data):
+                    replyAptData(i+1, chat_id)
+            elif num_of_data >= int(args[1]):
+                replyAptData(str(int(args[1])), chat_id)
             else:
                 noti.sendMessage( chat_id, '검색된 지역의 수 보다 높은 번호를 불렀습니다.' )
-                noti.sendMessage( chat_id, '현재 검색된 지역의 수는 '+str(num_of_data)+'입니다' )
+                noti.sendMessage( chat_id, '현재 검색된 지역의 수는 '+str(num_of_data)+'개 입니다' )
         else:
             noti.sendMessage( chat_id, '검색된 지역이 없습니다.\n다른 값을 검색해 보세요' )
-        pass
+    if text.startswith('날씨전부'):
+        print('try to 날씨전부')
+        if return_lsit == None:
+            noti.sendMessage( chat_id, '검색된 지역이 없습니다.\n다른 값을 검색해 보세요' )
+        num_of_data = len(return_lsit)
+        if num_of_data:
+            for i in range(num_of_data):
+                replyAptData(i, chat_id)
+        else:
+            noti.sendMessage( chat_id, '검색된 지역이 없습니다.\n다른 값을 검색해 보세요' )
     elif text.startswith('저장') and len(args)>1:
         print('try to 저장', args[1])
         save( chat_id, args[1] )
@@ -80,33 +94,49 @@ def handle(msg):
         check( chat_id )
     elif text.startswith('검색') and len(args)>1:
         print('try to 검색', args[1])
+        if args[1] == '확인':
+                text = ''
+                count = 1
+                for i, data in enumerate(return_lsit):   # 포멧을 사용해보자.
+                    name, val = data
+                    text += '['+str(i+1 )+']'
+                    text += str(name)
+                    text += '\n'
+                noti.sendMessage( chat_id, text )
+                return
         return_lsit = common_functions.Get_Name_Val_From_Dict(args[1], adress_dict)
+        if return_lsit == None:
+            noti.sendMessage( chat_id, '검색된 지역이 없습니다.\n다른 값을 검색해 보세요' )
         num_of_data = len(return_lsit)
         if num_of_data:
             noti.sendMessage( chat_id, str(num_of_data)+'개 지역 검색' )
+            noti.sendMessage( chat_id, '검색 결과를 확인하려면 "검색확인" 을 입력해주세요' )
+            noti.sendMessage( chat_id, '날씨를 확인하려면 "날씨"와 "검색된 결과의 순서"or "전부"를 입력해주세요\n예) "날씨 '+str(num_of_data//2)+'", "날씨 전부"')
         else:
             noti.sendMessage( chat_id, '검색된 지역이 없습니다.\n다른 값을 검색해 보세요' )
-
     elif text.startswith('검색확인'):
         print('try to 검색확인')
+        if return_lsit == None:
+            noti.sendMessage( chat_id, '검색된 지역이 없습니다.\n다른 값을 검색해 보세요' )
         num_of_data = len(return_lsit)
         if num_of_data:
             text = ''
             count = 1
-            for name, val in return_lsit:   # 포멧을 사용해보자.
-                text += str(name)+', '
-                if count % 4 == 0:
-                    text += '\n'
+            for i, data in enumerate(return_lsit):   # 포멧을 사용해보자.
+                name, val = data
+                text += '['+str(i+1 )+']'
+                text += str(name)
+                text += '\n'
             noti.sendMessage( chat_id, text )
         else:
             noti.sendMessage( chat_id, '검색된 지역이 없습니다.' )
-
     elif text.startswith('?'):
         print('try to ?')
         noti.sendMessage(chat_id,
 '''명령어 모음입니다.
-날씨 [검색된 지역의 수 이하의 숫자]
+날씨 [검색된 지역의 수 이하의 숫자 or 전부]
  - 해당하는 지역의 날씨를 출력합니다
+ - 전부 를 입력하면 전부 다 나옵니다.
 
 저장 [저장할 단어]
  - 입력 단어를 저장합니다
