@@ -69,11 +69,15 @@ def handle(msg):
             if args[1] == '전부':
                 for i in range(num_of_data):
                     replyAptData(i+1, chat_id)
-            elif num_of_data >= int(args[1]) > 0:
-                replyAptData(str(int(args[1])), chat_id)
             else:
-                noti.sendMessage( chat_id, '검색된 지역의 수 보다 높은 번호를 불렀습니다.' )
-                noti.sendMessage( chat_id, '현재 검색된 지역의 수는 '+str(num_of_data)+'개 입니다' )
+                if args[1].isdigit():  
+                    if num_of_data >= int(args[1]) > 0:
+                        replyAptData(str(int(args[1])), chat_id)
+                    else:
+                        noti.sendMessage( chat_id, '검색된 지역의 수 보다 높은 번호를 불렀습니다.' )
+                        noti.sendMessage( chat_id, '현재 검색된 지역의 수는 '+str(num_of_data)+'개 입니다' )
+                else:
+                        noti.sendMessage( chat_id, '잘못된 값을 입력했습니다.\n숫자나 "전부"를 입력해주세요' )
         else:
             noti.sendMessage( chat_id, '검색된 지역이 없습니다.\n다른 값을 검색해 보세요' )
     elif text.startswith('날씨전부'):
