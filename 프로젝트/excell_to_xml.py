@@ -8,7 +8,7 @@ from collections import defaultdict # 초기화를 해주지 않아도 된다.
 # 
 # print(df)
 
-wb =openpyxl.load_workbook(r'C:\Users\yyyyw\Desktop\script\팀과제\기상청41_단기예보 조회서비스_오픈API활용가이드_격자_위경도(20220103).xlsx')
+wb =openpyxl.load_workbook(r'기상청41_단기예보 조회서비스_오픈API활용가이드_격자_위경도(20220103).xlsx')
 
 sheet = wb.get_sheet_by_name('최종 업데이트 파일_20220103')
 data1 = sheet['A1'].value
@@ -53,11 +53,9 @@ f = open('adress', 'wb') #pickle 사용을 위해 바이너리 쓰기 파일 오
 pickle.dump(adress, f) #리스트 객체를 파일로 dump
 f.close()
 
-# import pprint
-# pprint.pprint(adress)
-
-f = open('adress', 'rb') #pickle 사용을 위해 바이너리 읽기 파일 오픈
-dict = pickle.load(f) #파일에서 리스트 load
-
-import pprint
-pprint.pprint(dict)
+if __name__ == '__main__':
+    f = open('adress', 'rb') #pickle 사용을 위해 바이너리 읽기 파일 오픈
+    dict = pickle.load(f) #파일에서 리스트 load
+    f.close()
+    import pprint
+    pprint.pprint(dict)
