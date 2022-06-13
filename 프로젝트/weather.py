@@ -7,6 +7,7 @@ from tkinter import font
 from collections import defaultdict
 from numpy import true_divide
 import tkintermapview   # 지도를 위한 참조
+from PIL import ImageTk
 
 import spam
 
@@ -36,9 +37,16 @@ base_time = ""
 
 weather_list = [[],[],[],[],[]] # [0] = 강수확률 [1] = 강수량 [2] = 온도 [3] =습도 [4] = 하늘상태
 
+cloud=PhotoImage(file=r"scriptlang\프로젝트\cloud.PNG")
+sun=PhotoImage(file=r"scriptlang\프로젝트\sun.PNG")
+rain=PhotoImage(file=r"scriptlang\프로젝트\rain.PNG")
 
 
 Cur_temp = "0"          # 현재 온도    
+Cur_Air= "구름 많음"             # 현재 하늘 상태
+Cur_Rain= "없음"             # 현재 강수량
+Cur_Humidity ="0"        # 현재 습도
+
 items= NULL
 
 default_status = "기본보기"
@@ -91,7 +99,7 @@ def Update():
     global serviceKey,url
     global nx,ny
     global base_date, base_time
-    global items,Cur_temp
+    global items,Cur_temp,Cur_Air,Cur_Humidity,Cur_Rain
     global base_date,base_time,weather_list
     base_date, base_time = common_functions.Set_Time()
     
@@ -128,8 +136,17 @@ def Update():
             weather_list[cnt].append(item['fcstValue'])
             
     print(weather_list)         #weather_list = # [0] = 강수확률 [1] = 강수량 [2] = 온도 [3] =습도 [4] = 하늘상태
-            
+   
+    if(weather_list[1][0]=='강수없음'): Cur_Rain= False
+    else: Cur_Rain = True
+    
     Cur_temp=weather_list[2][0]
+    Cur_Humidity=weather_list[3][0]
+    if(weather_list[4][0]=='1'): Cur_Air = "맑음"
+    elif(weather_list[4][0]=='3'): Cur_Air = "구름많음"
+    elif(weather_list[4][0]=='4'):Cur_Air="흐림"
+    
+    
     
     Update_Label_Temp()
     Update_map()
@@ -275,6 +292,23 @@ def Search_city():
         City_Name_Lable.config(text=str(name))
         Update()
 
+def draw_default(canvasWidth,canvasHeight):
+    global canvas
+    global Cur_temp,Cur_Air,Cur_Humidity,Cur_Rain
+    canvas.delete(corrent_canvas_status)
+    global weather_list
+    
+    if(Cur_Rain==False):
+        
+        if Cur_Air=='맑음':canvas.create_image(300,80,image=sun,tags=corrent_canvas_status)
+        elif Cur_Air=='구름많음' or Cur_Air=='흐림':canvas.create_image(300,80,image=cloud,tags=corrent_canvas_status)
+    else:
+        canvas.create_image(300,80,image=rain,tags=corrent_canvas_status)
+    
+    
+    canvas.create_text(300,180, text ="하늘 상태 =  "+Cur_Air, font = ("나눔고딕코딩", 20),tags=corrent_canvas_status)
+    canvas.create_text(300,220, text ="현재 습도 =  "+Cur_Humidity+"%", font = ("나눔고딕코딩", 20),tags=corrent_canvas_status)
+
 def draw_graph(canvasWidth, canvasHeight):
     global canvas
     canvas.delete(corrent_canvas_status) # 기존 그림 지우기
@@ -368,8 +402,8 @@ def draw_canvas():
     
     if len(weather_list[0]) != 0:
         if corrent_canvas_status == default_status:
-            text1 = canvas.create_text(200,220, text = corrent_canvas_status, font = ("나눔고딕코딩", 20),tags=corrent_canvas_status)
             # 여기서 날씨정보
+            draw_default(580,260)
         elif corrent_canvas_status == opposite_status:
             # 여기서 위에 나온 정보들의 그래프를 그린다.
             draw_graph(580, 260)
