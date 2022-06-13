@@ -46,21 +46,22 @@ def make_data(name, base_date, base_time, weather_list):
 
 
 def rain_condition(n):
+    #강수형태- 없음(0), 비(1), 비/눈(2), 눈(3), 빗방울(5), 빗방울눈날림(6), 눈날림(7)
     data = ''
     if n == '0':
-        data = '비가 오지 않습니다.'
+        data = '없음'
     elif n == '1':
-        data= '비가 옵니다.'
+        data= '비'
     elif n== '2':
-        data= '비/눈이 옵니다.'
+        data= '비/눈'
     elif n== '3':
-        data= '눈이 옵니다.'           
+        data= '눈'           
     elif n== '5':
-        data= '빗방울이 떨어집니다.'
+        data= '빗방울'
     elif n== '6':
-        data= '빗방울눈날림이 있습니다.'
+        data= '빗방울눈날림'
     elif n== '7':
-        data= '눈날림이 있습니다.'
+        data= '눈날림'
     return data                                
 
 def sky_condition(n):

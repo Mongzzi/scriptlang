@@ -112,7 +112,7 @@ def Update():
         weather_list = [[],[],[],[],[]]
 
     for item in items['item']:
-        if item['category'] =='PTY':    #강수확률- 없음(0), 비(1), 비/눈(2), 눈(3), 빗방울(5), 빗방울눈날림(6), 눈날림(7)
+        if item['category'] =='PTY':    #강수형태- 없음(0), 비(1), 비/눈(2), 눈(3), 빗방울(5), 빗방울눈날림(6), 눈날림(7)
             #print(item['fcstValue'])
             cnt=0
             weather_list[cnt].append(item['fcstValue'])
@@ -195,8 +195,8 @@ def onEmailInput():
     global base_date,base_time,weather_list
     global Email_Popup, Email_Popup_Popup, Popup_Popup_Lable, Popup_Popup_Button
     
-    #[0] = 강수확률 [1] = 강수량 [2] = 온도 [3] =습도 [4] = 하늘상태
-    #강수확률- 없음(0), 비(1), 비/눈(2), 눈(3), 빗방울(5), 빗방울눈날림(6), 눈날림(7)
+    #[0] = 강수형태 [1] = 강수량 [2] = 온도 [3] =습도 [4] = 하늘상태
+    #강수형태- 없음(0), 비(1), 비/눈(2), 눈(3), 빗방울(5), 빗방울눈날림(6), 눈날림(7)
     email = Email_Entry.get()
     
     # 이메일 검사
@@ -364,8 +364,8 @@ def draw_graph(canvasWidth, canvasHeight):
         if not hour:    # 0시로 표시하고 싶으면 주석처리할것.
             hour = 24
         canvas.create_text((left+right)//2, bottom+10, text=spam.itoa(hour)+':'+"30", tags=corrent_canvas_status)
-        # 강수 확률
-        canvas.create_text((left+right)//2, bottom+25, text=weather_list[0][i], tags=corrent_canvas_status)
+        # 강수 형태
+        canvas.create_text((left+right)//2, bottom+25, text=common_functions.rain_condition(weather_list[0][i]), tags=corrent_canvas_status)
         # 강수량
         canvas.create_text((left+right)//2, bottom+40, text=weather_list[1][i], tags=corrent_canvas_status)
 
@@ -390,7 +390,7 @@ def draw_graph(canvasWidth, canvasHeight):
 
     canvas.create_text(30, bottom-10, text='온도', tags=corrent_canvas_status)
     canvas.create_text(30, bottom+10, text='시간', tags=corrent_canvas_status)
-    canvas.create_text(30, bottom+25, text='강수 확률', tags=corrent_canvas_status)
+    canvas.create_text(30, bottom+25, text='강수 형태', tags=corrent_canvas_status)
     canvas.create_text(30, bottom+40, text='강수량', tags=corrent_canvas_status)
 
 
