@@ -347,9 +347,12 @@ def draw_graph(canvasWidth, canvasHeight):
         if nMax == data[i]: color="red"
         elif nMin == data[i]: color='blue'
         else: color="grey"
-        
+            
         # curHeight = maxheight * data[i] / nMax # 최대값에 대한 비율 반영 막대그래프
-        curHeight = maxheight * ((data[i] - nMin)/(nMax - nMin)) # 꺾은선 그래프를 위한 비율
+        if nMax == nMin:
+            curHeight = maxheight*0.5
+        else:
+            curHeight = maxheight * ((data[i] - nMin)/(nMax - nMin)) # 꺾은선 그래프를 위한 비율
         top = bottom - curHeight # bar의 top 위치
         left = size_of_infomation + i * rectWidth + rectWidth * (1 - percentage_of_rect) / 2 # bar의 left 위치
         right = size_of_infomation + (i + 1) * rectWidth - rectWidth * (1 - percentage_of_rect) / 2# bar의 right 위치
