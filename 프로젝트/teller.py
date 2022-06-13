@@ -76,7 +76,7 @@ def handle(msg):
                 noti.sendMessage( chat_id, '현재 검색된 지역의 수는 '+str(num_of_data)+'개 입니다' )
         else:
             noti.sendMessage( chat_id, '검색된 지역이 없습니다.\n다른 값을 검색해 보세요' )
-    if text.startswith('날씨전부'):
+    elif text.startswith('날씨전부'):
         print('try to 날씨전부')
         if return_lsit == None:
             noti.sendMessage( chat_id, '검색된 지역이 없습니다.\n다른 값을 검색해 보세요' )
@@ -137,6 +137,7 @@ def handle(msg):
 날씨 [검색된 지역의 수 이하의 숫자 or 전부]
  - 해당하는 지역의 날씨를 출력합니다
  - 전부 를 입력하면 전부 다 나옵니다.
+ 예) 날씨 4, 날씨전부, 날씨 전부
 
 저장 [저장할 단어]
  - 입력 단어를 저장합니다
@@ -146,9 +147,11 @@ def handle(msg):
 
 검색 [검색할 지역에 포함된 단어]
  - 입력한 단어가 포함된 지역을 전부 검색합니다
+예) 검색 광, 검색 4, 검색 서, 검색 ,
 
-검색확인
+검색확인 or 검색 확인
  - 검색한 지역들을 출력합니다.
+
 
 중 하나의 명령을 입력하세요.]
 ''')
