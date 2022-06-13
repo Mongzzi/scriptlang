@@ -19,10 +19,13 @@ root.title('Sun')
 
 #------------------------이미지-----------------------------------
 
-canvas_bg=PhotoImage(file=r"scriptlang\프로젝트\canvas_bg.png")
-mail_img= PhotoImage(file=r"scriptlang\프로젝트\mail_640_416.png")
-weather_top_img=PhotoImage(file=r"scriptlang\프로젝트\weather_top.PNG")
-weather_bottom_img=PhotoImage(file=r"scriptlang\프로젝트\weather_bottom.PNG")
+canvas_bg=PhotoImage(file=r"image/canvas_bg.png")
+
+mail_img= PhotoImage(file=r"image/mail_640_416.png")
+
+cloud=PhotoImage(file=r"image/cloud.PNG")
+sun=PhotoImage(file=r"image/sun.PNG")
+rain=PhotoImage(file=r"image/rain.PNG")
 
 #------------------------global 변수------------------------------
 
@@ -37,9 +40,7 @@ base_time = ""
 
 weather_list = [[],[],[],[],[]] # [0] = 강수확률 [1] = 강수량 [2] = 온도 [3] =습도 [4] = 하늘상태
 
-cloud=PhotoImage(file=r"scriptlang\프로젝트\cloud.PNG")
-sun=PhotoImage(file=r"scriptlang\프로젝트\sun.PNG")
-rain=PhotoImage(file=r"scriptlang\프로젝트\rain.PNG")
+
 
 
 Cur_temp = "0"          # 현재 온도    
