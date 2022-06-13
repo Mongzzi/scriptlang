@@ -16,6 +16,13 @@ root = Tk()
 root.geometry("600x700+600+100")
 root.title('Sun')
 
+#------------------------이미지-----------------------------------
+
+canvas_bg=PhotoImage(file=r"scriptlang\프로젝트\canvas_bg.png")
+mail_img= PhotoImage(file=r"scriptlang\프로젝트\mail_640_416.png")
+weather_top_img=PhotoImage(file=r"scriptlang\프로젝트\weather_top.PNG")
+weather_bottom_img=PhotoImage(file=r"scriptlang\프로젝트\weather_bottom.PNG")
+
 #------------------------global 변수------------------------------
 
 nx = "62"               # 위도 변수
@@ -92,7 +99,6 @@ def Update():
     response = requests.get(url, params=params)
     #print(response.content)
     items = response.json().get('response').get('body').get('items')
-    
     if weather_list:
         weather_list = [[],[],[],[],[]]
 
@@ -125,7 +131,7 @@ def Update():
             
     Cur_temp=weather_list[2][0]
     
-    Change_Label_Temp()
+    Update_Label_Temp()
     Update_map()
     draw_canvas() # 업데이트할때도 다시 그려야함
 
@@ -133,11 +139,9 @@ def Update():
 adress_dict = None
 
 # cities = ["서울","부산","경기","인천"]
-mail_img= PhotoImage(file=r"scriptlang\프로젝트\mail_640_416.png")
-weather_top_img=PhotoImage(file=r"scriptlang\프로젝트\weather_top.PNG")
-weather_bottom_img=PhotoImage(file=r"scriptlang\프로젝트\weather_bottom.PNG")
 
-def Change_Label_Temp():
+
+def Update_Label_Temp():
     global Cur_Temp_Lable
     global Cur_temp
     
@@ -258,15 +262,16 @@ def Search_city():
     val = NULL
 
     return_lsit = common_functions.Get_Name_Val_From_Dict(for_search, adress_dict)
-    name, val = return_lsit[0]
     
     if not len(return_lsit):
-        City_Name_Lable.config(text=str(for_search)+" 찾지 못함")
+        City_Name_Lable.config(text=str(name))
+        Cur_Temp_Lable.config(text=str(for_search)+" 찾지 못함")
         print(for_search)
         print("찾지 못 함")
                             # 1. 찾지 못 했을 경우 다른 값을 반환하고, 만약 이 값이 반환되면 찾지 못했다고 판단해야함. 
                             # 2. 혹은 그냥 입력 받을때 기본값을 NULL로 해놓고 NULL이면 찾지 못했다고 코딩하면 될듯.
     else:
+        name, val = return_lsit[0]
         print(name)
         print(val)
         nx, ny, latitude, longitude = val
@@ -364,13 +369,21 @@ def draw_graph(canvasWidth, canvasHeight):
 
 def draw_canvas():
     global canvas
-    if corrent_canvas_status == default_status:
-        text1 = canvas.create_text(200,220, text = corrent_canvas_status, font = ("나눔고딕코딩", 20),tags=corrent_canvas_status)
-        # 여기서 날씨정보
-
-    elif corrent_canvas_status == opposite_status:
-        # 여기서 위에 나온 정보들의 그래프를 그린다.
-        draw_graph(580, 260)
+    # 기본 배경을 그린다.
+    # 검색된 결과가 없거나 검색한 적이 없으면 배경이 보일 것.
+    # 만약 검색한적이 없다면 아래 작업을 하지 않도록 하면 된다.
+    canvas.delete("bg")
+    
+    if len(weather_list[0]) != 0:
+        if corrent_canvas_status == default_status:
+            text1 = canvas.create_text(200,220, text = corrent_canvas_status, font = ("나눔고딕코딩", 20),tags=corrent_canvas_status)
+            # 여기서 날씨정보
+        elif corrent_canvas_status == opposite_status:
+            # 여기서 위에 나온 정보들의 그래프를 그린다.
+            draw_graph(580, 260)
+    else:
+        imagesprite = canvas.create_image([290,130], image=canvas_bg, tags="bg")
+        canvas.image_names=canvas_bg
 
 def View_Detail():
     global corrent_canvas_status, next_canvas_status
@@ -438,10 +451,10 @@ Renewal_Button=Button(Frame_search,width=10,font=fontNormal,text="새로고침",
 Renewal_Button.pack(side="left",padx=10)
 
     # 현재 최고 최저 기온 레이블 , 상세보기 버튼, 이메일 버튼
-Cur_Temp_Lable= Label(Frame_etc,font=fontNormal,borderwidth=3,relief='groove',text="현재 기온 {0}".format(Cur_temp +"도"),bg='#FFFF99')
+Cur_Temp_Lable= Label(Frame_etc,font=fontNormal,borderwidth=3,relief='groove',text="      위에서      ",bg='#FFFF99')
 Cur_Temp_Lable.pack(side="left",padx=10,fill="both")
     
-City_Name_Lable= Label(Frame_etc,font=fontNormal,borderwidth=3,relief='groove',width=13,text= "O O 시",bg='#FFFF99')
+City_Name_Lable= Label(Frame_etc,font=fontNormal,borderwidth=3,relief='groove',width=13,text= "검색을 해주세요",bg='#FFFF99')
 City_Name_Lable.pack(side="left",padx=10,fill="both")
 
 # Low_Temp_Lable= Label(Frame_etc,font=fontNormal,borderwidth=3,relief='groove',text="최저 기온 {0}".format(Cur_temp+"도"),bg='#FFFF99')
