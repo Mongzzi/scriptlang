@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta  # 현재 날짜 외의 날짜 �
 
 
 def Read_Adress_From_File():
-    f = open('adress', 'rb') #pickle 사용을 위해 바이너리 읽기 파일 오픈
+    f = open('adr/adress', 'rb') #pickle 사용을 위해 바이너리 읽기 파일 오픈
     return pickle.load(f) #파일에서 리스트 load
 
 def Get_Name_Val_From_Dict(for_search, adress_dict):
