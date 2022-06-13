@@ -8,6 +8,7 @@ from collections import defaultdict
 from numpy import true_divide
 import tkintermapview   # 지도를 위한 참조
 
+import spam
 
 import common_functions
 
@@ -269,8 +270,10 @@ def Search_city():
         print(name)
         print(val)
         nx, ny, latitude, longitude = val
-        nx = str(nx)
-        ny = str(ny)
+        if type(nx) == int:
+            nx = spam.itoa(nx)
+        if type(ny) == int:
+            ny = spam.itoa(ny)
         
         City_Name_Lable.config(text=str(name))
         Update()
@@ -328,7 +331,7 @@ def draw_graph(canvasWidth, canvasHeight):
         hour = (int(base_time)//100 + i) % 24
         if not hour:    # 0시로 표시하고 싶으면 주석처리할것.
             hour = 24
-        canvas.create_text((left+right)//2, bottom+10, text=str(hour)+':'+"30", tags=corrent_canvas_status)
+        canvas.create_text((left+right)//2, bottom+10, text=spam.itoa(hour)+':'+"30", tags=corrent_canvas_status)
         # 강수 확률
         canvas.create_text((left+right)//2, bottom+25, text=weather_list[0][i], tags=corrent_canvas_status)
         # 강수량
