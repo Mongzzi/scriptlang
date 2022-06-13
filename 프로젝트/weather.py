@@ -193,7 +193,6 @@ def onEmailInput():
     if Email_Flag:
         if email:
             show_data = common_functions.make_data(name, base_date,base_time,weather_list)
-            # print(show_data)
             msg=MIMEText(show_data)
             msg['Subject']= '날씨 정보'
             try:
@@ -222,7 +221,6 @@ def onEmailInput():
         lable_text += '(이)가 없습니다.'
 
         popup_command=Popup_Popup_command
-        print('예외처리 : 이메일이 아님')
 
     Email_Popup_Popup = Toplevel(Email_Popup) # popup 띄우기
     Email_Popup_Popup.geometry("400x150")
@@ -264,16 +262,10 @@ def Search_city():
     return_lsit = common_functions.Get_Name_Val_From_Dict(for_search, adress_dict)
     
     if not len(return_lsit):
-        City_Name_Lable.config(text=str(name))
-        Cur_Temp_Lable.config(text=str(for_search)+" 찾지 못함")
-        print(for_search)
-        print("찾지 못 함")
-                            # 1. 찾지 못 했을 경우 다른 값을 반환하고, 만약 이 값이 반환되면 찾지 못했다고 판단해야함. 
-                            # 2. 혹은 그냥 입력 받을때 기본값을 NULL로 해놓고 NULL이면 찾지 못했다고 코딩하면 될듯.
+        City_Name_Lable['text'] = str(name)
+        Cur_Temp_Lable['text'] = str(for_search)+" 찾지 못함"
     else:
         name, val = return_lsit[0]
-        print(name)
-        print(val)
         nx, ny, latitude, longitude = val
         if type(nx) == int:
             nx = spam.itoa(nx)
