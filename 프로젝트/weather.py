@@ -217,7 +217,7 @@ def onEmailInput():
                 sendMail('hjna0206@gmail.com',email,msg)
                 main_text="발송 성공"
 
-                lable_text="성공"
+                lable_text="성공" # 역시나 아니였구요
                 
                 popup_command=Popup_Popup_command_2
             except:
